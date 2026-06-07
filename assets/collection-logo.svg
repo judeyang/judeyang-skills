@@ -1,0 +1,10 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JudeYang Skills logo">
+  <rect width="160" height="160" rx="28" fill="#1F1A16"/>
+  <rect x="16" y="16" width="128" height="128" rx="20" fill="#F4EDE1"/>
+  <path d="M43 50H95C108.255 50 119 60.745 119 74V86C119 99.255 108.255 110 95 110H43V50Z" fill="#1F1A16"/>
+  <path d="M57 65H91C98.18 65 104 70.82 104 78V82C104 89.18 98.18 95 91 95H57V65Z" fill="#A8854A"/>
+  <circle cx="57" cy="80" r="14" fill="#D86F64"/>
+  <circle cx="104" cy="80" r="14" fill="#28A6A6"/>
+  <path d="M64 80H97" stroke="#F4EDE1" stroke-width="6" stroke-linecap="round"/>
+  <path d="M80 38V30M80 130V122M38 80H30M130 80H122" stroke="#A8854A" stroke-width="6" stroke-linecap="round"/>
+</svg>

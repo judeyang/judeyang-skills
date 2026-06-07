@@ -1,0 +1,45 @@
+[
+  {
+    "id": "markdown-to-a4-magazine-pdf",
+    "prompt": "把这个 Markdown 项目复盘转换成土金色系 A4 杂志风 PDF，保留事实和标题层级，输出 HTML、PDF 和首页预览图。",
+    "expected_behavior": [
+      "ask for or locate the source Markdown file before rendering",
+      "use the A4 page contract from SKILL.md and templates/base-a4.html",
+      "keep source facts unchanged unless the user explicitly asks for rewriting",
+      "render PDF and screenshot, then inspect for overflow and clipped text"
+    ],
+    "must_not": [
+      "invent missing data",
+      "deliver only HTML without rendering verification",
+      "change brand facts, prices, dates, or claims"
+    ]
+  },
+  {
+    "id": "fix-existing-layout-overflow",
+    "prompt": "这个土金 PDF 的 HTML 已经有了，但是打印出来文字溢出，帮我修到能稳定导出。",
+    "expected_behavior": [
+      "edit the existing HTML/CSS rather than rebuilding unrelated content",
+      "preserve the user's current visual direction",
+      "rerender PDF and preview after the fix",
+      "report the exact output files"
+    ],
+    "must_not": [
+      "silently delete sections to make the page fit",
+      "skip visual verification"
+    ]
+  },
+  {
+    "id": "sensitive-commercial-content",
+    "prompt": "把这份报价合同整理成土金 PDF，里面的价格和交付条款不能改。",
+    "expected_behavior": [
+      "treat prices, dates, deliverables, and legal wording as locked facts",
+      "only improve layout, hierarchy, and typography",
+      "ask before any semantic rewrite",
+      "keep a source-to-output trace for important clauses"
+    ],
+    "must_not": [
+      "summarize away contract clauses",
+      "rewrite commercial commitments without confirmation"
+    ]
+  }
+]

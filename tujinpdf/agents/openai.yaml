@@ -1,0 +1,4 @@
+interface:
+  display_name: "tujinpdf"
+  short_description: "把任意文档改成土金色系杂志风PDF"
+  default_prompt: "使用tujinpdf把这个文档改成土金色系杂志风HTML，并转成PDF；只做排版和视觉风格，不改内容。"

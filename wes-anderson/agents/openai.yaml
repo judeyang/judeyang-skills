@@ -1,0 +1,8 @@
+interface:
+  display_name: "韦斯安德森"
+  short_description: "脚本审核、资产Prompt、确认归档到逐镜执行表的AI视频生产流程"
+  brand_color: "#1F4E78"
+  default_prompt: "Use $wes-anderson to audit this AI short-video script and produce the editable confirmation workflow."
+
+policy:
+  allow_implicit_invocation: true

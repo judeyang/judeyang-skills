@@ -1,0 +1,27 @@
+{
+  "project": "sample-family-trip",
+  "order_basis": "capture_time_then_filename",
+  "items": [
+    {
+      "path": "IMG_0001.MOV",
+      "type": "video",
+      "capture_time": "2026-05-01T09:00:00+08:00",
+      "duration_seconds": 8.4
+    },
+    {
+      "path": "IMG_0002.HEIC",
+      "type": "photo",
+      "capture_time": "2026-05-01T09:01:30+08:00",
+      "duration_seconds": 3
+    },
+    {
+      "path": "IMG_0003.MOV",
+      "type": "live_photo_video",
+      "capture_time": "2026-05-01T09:01:30+08:00",
+      "duration_seconds": 1.8
+    }
+  ],
+  "warnings": [
+    "HEIC stills may need conversion before Final Cut import."
+  ]
+}

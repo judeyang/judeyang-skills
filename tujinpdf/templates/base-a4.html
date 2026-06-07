@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>土金PDF</title>
+  <style>
+    :root {
+      --paper: #f4ede1;
+      --surface: #efe6d6;
+      --text: #1f1a16;
+      --muted: #4a3f33;
+      --note: #8a7a68;
+      --gold: #a8854a;
+      --line: rgba(31, 26, 22, 0.14);
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--paper);
+      font-family: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 22mm 20mm 18mm;
+      page-break-after: always;
+      background: var(--paper);
+      position: relative;
+    }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cover-frame {
+      border-top: 2px solid var(--gold);
+      border-bottom: 1px solid var(--line);
+      padding: 18mm 0 12mm;
+    }
+
+    .eyebrow,
+    .pg-ft,
+    .note {
+      color: var(--note);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 10mm 0 4mm;
+      font-size: 30pt;
+      line-height: 1.18;
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18pt;
+      line-height: 1.35;
+    }
+
+    p {
+      font-size: 10.5pt;
+      line-height: 1.85;
+      margin: 0 0 4mm;
+    }
+
+    .pg-hd,
+    .pg-ft {
+      display: flex;
+      justify-content: space-between;
+      gap: 8mm;
+      font-size: 8.5pt;
+      border-top: 1px solid var(--line);
+      padding-top: 3mm;
+    }
+
+    .ch {
+      margin: 0 0 10mm;
+    }
+
+    .ch-head {
+      display: grid;
+      grid-template-columns: 16mm 1fr;
+      gap: 5mm;
+      align-items: baseline;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 4mm;
+      margin-bottom: 6mm;
+    }
+
+    .ch-num {
+      color: var(--gold);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: 17pt;
+      font-weight: 700;
+    }
+
+    .fact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4mm;
+      margin: 7mm 0;
+    }
+
+    .prod {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 5mm;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6mm 0;
+      font-size: 8.8pt;
+      line-height: 1.55;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 2.4mm 2.6mm;
+      vertical-align: top;
+    }
+
+    th {
+      text-align: center;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    td.short {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    td.long {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="cover-frame">
+      <div class="eyebrow">DOCUMENT TYPE / SOURCE / DATE</div>
+      <h1>文档标题</h1>
+      <p>这里放摘要或关键说明。保持原文事实，不静默改写内容。</p>
+    </div>
+    <div class="pg-ft">
+      <span>土金PDF</span>
+      <span>v01</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="ch">
+      <div class="ch-head">
+        <div class="ch-num">01</div>
+        <h2>章节标题</h2>
+      </div>
+      <p>正文内容从这里开始。根据源文档结构拆成章节、段落、表格和信息块。</p>
+      <div class="fact-grid">
+        <div class="prod"><strong>关键信息</strong><br />保留原文数字、日期、人名和结论。</div>
+        <div class="prod"><strong>交付说明</strong><br />HTML 和 PDF 同时保留，后续基于 HTML 迭代。</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>项目</th><th>说明</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="short">示例</td><td class="long">长文本左对齐并自动换行。</td><td class="short">确认</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pg-ft">
+      <span>Document generated with TuJin PDF</span>
+      <span>Page 2</span>
+    </div>
+  </section>
+</body>
+</html>

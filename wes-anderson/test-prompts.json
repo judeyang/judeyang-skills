@@ -1,0 +1,44 @@
+[
+  {
+    "id": "client-script-audit-workbook",
+    "prompt": "这是客户给的 AI 短剧脚本，帮我做脚本审核和脚本与资产确认表，给客户确认用。",
+    "expected_behavior": [
+      "identify the source script and current phase before writing files",
+      "create a client-facing workbook with 脚本审核确认表 first and 形象场景描述确认表 second",
+      "mark missing product/logo/font/music/materials as 待提供",
+      "include client decision columns and block downstream prompt generation until confirmation"
+    ],
+    "must_not": [
+      "put internal Prompt production language in the client-facing workbook",
+      "treat unconfirmed script changes as approved"
+    ]
+  },
+  {
+    "id": "internal-asset-production-table",
+    "prompt": "客户要先看人物和场景设定图，帮我出内部设定资产制作表和生成 Prompt。",
+    "expected_behavior": [
+      "place the workbook under 05_内部制作执行",
+      "write or revise actual asset prompts after reading script context",
+      "separate producer-facing prompt work from client-facing confirmation files",
+      "tell the user that generated images must be回填到确认表 before client confirmation"
+    ],
+    "must_not": [
+      "put 设定资产制作表 into 02_用户确认文件",
+      "present internal prompts as final client-approved deliverables"
+    ]
+  },
+  {
+    "id": "client-revision-after-sample",
+    "prompt": "客户看完 5 秒样片后要求改角色服装颜色，你帮我记录修改意见并更新后续表。",
+    "expected_behavior": [
+      "record original client wording, sample version, affected shots/assets, and affected duration",
+      "use neutral client-facing wording for affected generated duration",
+      "update downstream confirmation or prompt workbook only after recording the revision",
+      "state which files are affected and what remains blocked"
+    ],
+    "must_not": [
+      "use accusatory wording in client-facing archive",
+      "merge separate feedback rounds into one vague note"
+    ]
+  }
+]
