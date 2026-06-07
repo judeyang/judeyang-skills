@@ -10,8 +10,12 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 
-REQUIRED_LABELS = ["景别：", "机位：", "构图：", "运镜手法：", "动作：", "特效：", "声音：", "结束状态：", "衔接要求："]
-REQUIRED_SAMPLE_STYLE_SECTIONS = ["核心主题：", "【运镜规则】"]
+REQUIRED_LABELS = ["景别：", "机位：", "构图：", "运镜手法：", "画面内容：", "特效：", "声音：", "结束状态：", "衔接要求："]
+REQUIRED_PROMPT_SECTIONS = ["【基础设定】", "【氛围与画质】", "【画面内容】"]
+REQUIRED_BASE_LABELS = ["镜头任务：", "参考素材：", "人物/产品/道具/场景：", "连续性：", "声音：", "文字策略："]
+REQUIRED_QUALITY_LABELS = ["风格核心：", "视觉基调：", "色彩与影调："]
+DEPRECATED_VIDEO_SECTIONS = ["【运镜规则】", "【声音/台词】", "【负面要求】", "【关键帧调用】"]
+FORBIDDEN_ALTERNATE_HEADINGS = ["【视频类型】", "【产品一致性", "【三段式结构", "【逐秒分镜】", "【声音要求】"]
 PLACEHOLDERS = ["按本镜头需要选择", "根据主体动作采用", "按画面执行", "保持可识别", "适当", "根据实际情况"]
 GENERIC_TEMPLATE_PHRASES = [
     "围绕本段动作组织画面",
@@ -31,9 +35,12 @@ GENERIC_TEMPLATE_PHRASES = [
     "锁定第1个中段动作或表情状态",
     "锁定第2个中段动作或表情状态",
 ]
-NO_TEXT_RULES = ["无文字纯图片", "禁止生成字幕", "禁止生成字幕、标题", "水印"]
-FULL_PATH_MARKERS = ["/" + "Users/", "\\" + "Users\\", "file://"]
-MUSIC_PROMPT_MARKERS = ["音乐/音效：", "古筝", "琵琶", "背景乐", "配乐", "合奏", "轮指", "变奏"]
+TEXT_FORBID_MARKERS = ["禁止生成字幕", "水印", "乱码", "伪Logo"]
+NO_TEXT_MARKERS = ["无文字纯图片", "默认画面为无文字", "默认无文字"]
+ALLOWED_TEXT_MARKERS = ["文字策略", "产品镜头仅保留官方素材", "剧情道具", "报纸", "信件", "招牌", "包装", "屏显"]
+FULL_PATH_MARKERS = ["/Users/", "\\Users\\", "file://"]
+MUSIC_PROMPT_MARKERS = ["音乐/音效：", "古筝", "琵琶", "背景乐", "合奏", "轮指", "变奏"]
+MUSIC_BOUNDARY_MARKERS = ["不需要配乐", "不生成BGM", "不生成音乐/BGM", "不生成音乐", "不要配乐"]
 KEYFRAME_FILE_RE = re.compile(
     r"镜头\d+_(?:首帧|中间关键帧[A-Z]?|结尾帧)(?:_[^\\s；;,，。]+)?_v\\d+(?:_[^\\s；;,，。]+)?\\.(?:png|jpg|jpeg|webp)"
 )
@@ -41,6 +48,10 @@ SOLID_COLOR_KEYFRAME_FILE_RE = re.compile(r"镜头\d+_[^\s；;,，。]*(?:纯黑
 SOLID_COLOR_KEYFRAME_PHRASES = ["纯黑关键帧", "纯白关键帧", "纯色关键帧", "黑场关键帧", "白场关键帧", "纯黑画面作为关键帧", "纯白画面作为关键帧"]
 PRODUCT_RULE_MARKERS = ["机身比例", "Logo位置", "Logo错误", "出风口", "导风板", "屏显", "官方产品素材", "产品结构变形"]
 PRODUCT_REF_MARKERS = ["产品@", "CAP", "卡萨帝空调", "空调", "170°", "170度", "气流", "送风", "导风板", "出风口", "屏显"]
+QUALITY_BOUNDARY_RE = re.compile(r"质量边界：(?P<body>.*?)(?:\n|$)")
+STYLE_IN_SHOT_SIZE_MARKERS = ["电影感", "史诗感", "高级感", "质感", "氛围"]
+CAMERA_IN_COMPOSITION_MARKERS = ["无人机", "俯拍", "仰拍", "平视", "低机位", "高机位", "贴地", "正面30度", "侧面30度"]
+PHOTOREALISM_TYPO_MARKERS = ["Photirealism", "Photorealisim", "Photorealstic"]
 
 
 def find_header(ws, name: str) -> tuple[int, int]:
@@ -76,15 +87,16 @@ def extract_blocks(prompt: str) -> list[str]:
     if "【画面内容】" not in prompt:
         return []
     content = prompt.rsplit("【画面内容】", 1)[1]
-    if "【声音/台词】" in content:
-        content = content.split("【声音/台词】", 1)[0]
+    match = re.search(r"\n【[^】]+】", content)
+    if match:
+        content = content[: match.start()]
     return [block.strip() for block in re.split(r"(?=分镜\d+：|(?=\d{2}:\d{2}(?:\.\d+)?-\d{2}:\d{2}(?:\.\d+)?\s*·))", content) if block.strip()]
 
 
-def extract_keyframe_call(prompt: str) -> str:
-    if "【关键帧调用】" not in prompt:
+def extract_base_section(prompt: str) -> str:
+    if "【基础设定】" not in prompt:
         return ""
-    section = prompt.split("【关键帧调用】", 1)[1]
+    section = prompt.split("【基础设定】", 1)[1]
     match = re.search(r"\n【[^】]+】", section)
     if match:
         section = section[: match.start()]
@@ -99,6 +111,27 @@ def keyframe_files(text: str) -> list[str]:
             seen.add(filename)
             files.append(filename)
     return files
+
+
+def has_valid_text_strategy(prompt: str) -> bool:
+    has_forbidden_baseline = all(marker in prompt for marker in TEXT_FORBID_MARKERS)
+    has_default_no_text = any(marker in prompt for marker in NO_TEXT_MARKERS)
+    has_allowed_exception = any(marker in prompt for marker in ALLOWED_TEXT_MARKERS)
+    return has_forbidden_baseline and (has_default_no_text or has_allowed_exception)
+
+
+def quality_negative_count(prompt: str) -> int:
+    match = QUALITY_BOUNDARY_RE.search(prompt)
+    if not match:
+        return 0
+    body = match.group("body")
+    return body.count("避免") + body.count("禁止") + body.count("不要") + body.count("杜绝")
+
+
+def label_value(block: str, label: str) -> str:
+    pattern = rf"{re.escape(label)}(?P<value>.*?)(?:\n\S+：|\Z)"
+    match = re.search(pattern, block, re.S)
+    return match.group("value").strip() if match else ""
 
 
 def main() -> int:
@@ -153,44 +186,60 @@ def main() -> int:
             errors.append(f"镜头 {shot}: 生成前执行说明要求结尾帧，但结尾帧Prompt为空")
         if needs_end and end_prompt.startswith("无需单独生成"):
             errors.append(f"镜头 {shot}: 生成前执行说明要求结尾帧，但结尾帧Prompt被标记为无需生成")
-        if "【全片连续性/空间关系】" not in prompt:
-            errors.append(f"镜头 {shot}: 缺少 `【全片连续性/空间关系】`")
         has_product_ref = any(marker in (prompt + "\n" + refs_text + "\n" + exec_note) for marker in PRODUCT_REF_MARKERS)
         if not has_product_ref:
             for marker in PRODUCT_RULE_MARKERS:
                 if marker in prompt:
                     errors.append(f"镜头 {shot}: 非产品镜头包含产品专用规则 `{marker}`，请按本镜头相关性裁剪")
-        for section in REQUIRED_SAMPLE_STYLE_SECTIONS:
+        for section in REQUIRED_PROMPT_SECTIONS:
             if section not in prompt:
-                errors.append(f"镜头 {shot}: 缺少样板式 Prompt 结构 `{section}`")
+                errors.append(f"镜头 {shot}: 缺少三段式 Prompt 结构 `{section}`")
+        for label in REQUIRED_QUALITY_LABELS:
+            if label not in prompt:
+                errors.append(f"镜头 {shot}: 【氛围与画质】缺少 `{label}`")
+        base_section = extract_base_section(prompt)
+        for label in REQUIRED_BASE_LABELS:
+            if label not in base_section:
+                errors.append(f"镜头 {shot}: 【基础设定】缺少 `{label}`")
+        for section in DEPRECATED_VIDEO_SECTIONS:
+            if section in prompt:
+                errors.append(f"镜头 {shot}: 视频Prompt仍包含旧结构 `{section}`，请合并进三段式结构")
+        for heading in FORBIDDEN_ALTERNATE_HEADINGS:
+            if heading in prompt:
+                errors.append(f"镜头 {shot}: 视频Prompt包含替代标题 `{heading}`，必须使用【基础设定】/【氛围与画质】/【画面内容】")
+        if re.search(r"(^|\n)核心主题：", prompt):
+            errors.append(f"镜头 {shot}: 视频Prompt仍包含旧结构 `核心主题：`，请改为【基础设定】里的`镜头任务：`")
         if "关键帧出图" not in exec_note or "视频生成前上传" not in exec_note:
             errors.append(f"镜头 {shot}: 生成前执行说明缺少关键帧出图或视频生成前上传说明")
         if "关键帧视觉复核" not in exec_note:
             errors.append(f"镜头 {shot}: 生成前执行说明缺少关键帧视觉复核要求")
-        if "【关键帧调用】" not in prompt:
-            errors.append(f"镜头 {shot}: 视频Prompt缺少 `【关键帧调用】`，无法明确首帧/中间关键帧/结尾帧用法")
-        call_section = extract_keyframe_call(prompt)
         exec_files = keyframe_files(exec_note)
-        call_files = keyframe_files(call_section)
+        prompt_files = keyframe_files(prompt)
         for filename in exec_files:
-            if filename not in call_files:
-                errors.append(f"镜头 {shot}: 生成前执行说明中的关键帧 `{filename}` 未出现在视频Prompt的【关键帧调用】中")
-        if not needs_middle and "中间关键帧：不使用单独中间关键帧" not in call_section:
-            errors.append(f"镜头 {shot}: 生成前执行说明跳过中间关键帧，但【关键帧调用】未明确中间关键帧不使用")
-        if not needs_end and "结尾帧：不使用单独结尾帧" not in call_section:
-            errors.append(f"镜头 {shot}: 生成前执行说明跳过结尾帧，但【关键帧调用】未明确结尾帧不使用")
+            if filename not in prompt_files:
+                errors.append(f"镜头 {shot}: 生成前执行说明中的关键帧 `{filename}` 未出现在视频Prompt的参考素材说明中")
+        if not needs_middle and "中间关键帧" not in base_section:
+            errors.append(f"镜头 {shot}: 生成前执行说明跳过中间关键帧，但【基础设定】未说明中间关键帧不使用")
+        if not needs_end and "结尾帧" not in base_section:
+            errors.append(f"镜头 {shot}: 生成前执行说明跳过结尾帧，但【基础设定】未说明结尾帧不使用")
         if "引用资产：" in prompt:
             errors.append(f"镜头 {shot}: 视频Prompt包含散乱引用资产执行说明，应移到生成前执行说明并在画面描述中使用 inline asset tags")
-        if "音乐/BGM：不生成，后期单独配" not in prompt:
-            errors.append(f"镜头 {shot}: 视频Prompt缺少 `音乐/BGM：不生成，后期单独配`")
+        if not any(marker in prompt for marker in MUSIC_BOUNDARY_MARKERS):
+            errors.append(f"镜头 {shot}: 视频Prompt缺少音乐/BGM不生成或后期单独配的声音边界")
         for marker in MUSIC_PROMPT_MARKERS:
             if marker in prompt:
                 errors.append(f"镜头 {shot}: 视频Prompt包含音乐生成相关表达 `{marker}`，视频工具只生成音效/同期声")
         for marker in FULL_PATH_MARKERS:
             if marker in prompt or marker in refs_text:
                 errors.append(f"镜头 {shot}: 参考素材或 Prompt 中包含完整本地路径 `{marker}`，应改为文件名")
-        if not all(rule in prompt for rule in NO_TEXT_RULES):
-            errors.append(f"镜头 {shot}: 缺少无文字纯图片/禁止字幕水印规则")
+        for marker in PHOTOREALISM_TYPO_MARKERS:
+            if marker in prompt:
+                errors.append(f"镜头 {shot}: `{marker}` 拼写错误，应写为 `Photorealism`")
+        if not has_valid_text_strategy(prompt):
+            errors.append(f"镜头 {shot}: 缺少有效文字策略；默认应禁字幕/水印/乱码/伪Logo，产品或剧情道具文字必须明确例外")
+        negative_count = quality_negative_count(prompt)
+        if negative_count > 8:
+            errors.append(f"镜头 {shot}: 质量边界负面项过多（{negative_count}项），请裁剪到本镜头相关的3-6项，最多8项")
         for placeholder in PLACEHOLDERS:
             if placeholder in prompt:
                 errors.append(f"镜头 {shot}: 包含占位表达 `{placeholder}`")
@@ -205,9 +254,17 @@ def main() -> int:
             for label in REQUIRED_LABELS:
                 if label not in block:
                     errors.append(f"镜头 {shot} 分镜 {index}: 缺少 `{label}`")
+            shot_size = label_value(block, "景别：")
+            composition = label_value(block, "构图：")
+            for marker in STYLE_IN_SHOT_SIZE_MARKERS:
+                if marker in shot_size:
+                    errors.append(f"镜头 {shot} 分镜 {index}: `景别` 中包含风格词 `{marker}`，请移到【氛围与画质】")
+            for marker in CAMERA_IN_COMPOSITION_MARKERS:
+                if marker in composition:
+                    errors.append(f"镜头 {shot} 分镜 {index}: `构图` 中包含机位词 `{marker}`，请移到`机位`")
 
     if errors:
-        print("\\n".join(errors))
+        print("\n".join(errors))
         return 1
     print(f"PASS: {path.name} 已通过逐秒 Prompt 细节校验")
     return 0

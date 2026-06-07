@@ -72,7 +72,7 @@ Place this directory under a runtime that supports Agent Skills:
 Or use a runtime that supports GitHub-based skill installation:
 
 ```bash
-npx skills add https://github.com/judeyang/judeyang-skills/tree/main/tujinpdf
+npx skills add judeyang/tujinpdf
 ```
 
 ---
@@ -131,18 +131,6 @@ node scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
 
 The script prefers an available Puppeteer runtime. If Puppeteer's bundled Chrome is missing, it attempts to use the local Google Chrome installation.
 
-## Validation And Regression
-
-The new regression assets support Darwin or manual review:
-
-- `test-prompts.json`: covers new layout generation, existing-layout repair, and sensitive commercial content.
-- `examples/`: contains a minimal sample input and expected output notes.
-- `scripts/validate-output.mjs`: checks HTML/PDF/preview files, the A4 page contract, placeholders, and debug artifacts.
-
-```bash
-node scripts/validate-output.mjs output.html output.pdf preview.png
-```
-
 ---
 
 ## Quality Gate
@@ -195,17 +183,10 @@ tujinpdf/
 ├── README_EN.md
 ├── agents/
 │   └── openai.yaml
-├── examples/
-│   ├── expected-output-notes.md
-│   └── sample-report.md
 ├── references/
 │   └── fatepaw-style-notes.md
-├── templates/
-│   └── base-a4.html
-├── scripts/
-│   ├── render-html-pdf.mjs
-│   └── validate-output.mjs
-└── test-prompts.json
+└── scripts/
+    └── render-html-pdf.mjs
 ```
 
 ---

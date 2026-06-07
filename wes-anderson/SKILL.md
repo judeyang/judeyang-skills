@@ -9,11 +9,6 @@ Recommended human-facing name: **韦斯安德森**.
 
 Use this skill to convert a client script into a confirmed, executable AI video production package.
 
-Regression resources:
-- `examples/`: sample script and expected workbook structure.
-- `test-prompts.json`: Darwin/人工评估 prompts for client audit, internal asset production, and client revision tracking.
-- `scripts/validate_workbook_structure.py`: validates client, internal-asset, and internal-prompt workbook structure before delivery.
-
 The goal is practical delivery, not abstract critique:
 - Use Excel for anything the client or producer must edit, choose, or review.
 - Use PDF only after the relevant content is confirmed and needs archiving.
@@ -65,7 +60,7 @@ Stop and ask for confirmation at these points:
 2. Before submitting asset images to the client: require finished asset images to be placed under `03_设定资产/` and referenced back in `项目名_脚本与资产确认表_v01.xlsx`.
 3. Before creating the final confirmation PDF: require confirmed script conclusions, confirmed asset directions, and final approved asset images.
 4. Before writing the final internal prompt workbook: require the latest approved client confirmation workbook and confirmed reference assets.
-5. Before changing `references/prompt_standard.md` or any script under `scripts/`: require explicit user approval that the supplied prompt reference should become the new standard.
+5. Before changing `镜头设计师` 的 `references/prompt_standard.md` or prompt scripts: require explicit user approval that the supplied prompt reference should become the new standard.
 
 If a checkpoint is missing, create or update only the relevant workbook and clearly state which confirmation is blocking the next phase. The internal asset production branch may create prompts for the producer before client approval, but it is not user-facing and must not be treated as final approval.
 
@@ -331,19 +326,105 @@ Before delivering a client-facing PDF:
 3. Run `scripts/validate_client_facing_text.py` against the generated PDF text manifest.
 4. Do not deliver the PDF if the validator reports blocked wording or stale material status.
 
-### 6. Internal Execution Workbook With Prompts
+### 6. Internal Prompt And Shot Design
 
-Output: `05_内部制作执行/内部执行脚本与Prompt表_v01.xlsx`.
+Prompt generation is owned by the `镜头设计师` skill. Do not duplicate detailed prompt-writing rules inside this skill.
 
-This workbook is for production execution after client confirmation. It must preserve source script facts, confirmed revisions, reference asset paths, first-frame/keyframe planning, and video prompts in one auditable table.
+When the project reaches asset prompt writing or per-shot video prompt writing, call `镜头设计师` with:
+- approved `项目名_脚本与资产确认表_v01.xlsx`
+- project directory
+- confirmed asset directory `03_设定资产/`
+- target ratio, such as `9:16竖屏` or `16:9横屏`
+- target tool, such as Seedance, LibTV, or generic image/video generation
+- user-approved prompt reference style, if any
+- task type: `设定资产Prompt` or `逐镜视频Prompt`
 
-Before writing, validating, or delivering this workbook, read `references/prompt-workbook-rules.md`. That file is the source of truth for prompt columns, keyframe rules, QC, filename conventions, and anti-hallucination constraints.
+Expected handoff outputs from `镜头设计师`:
+- `05_内部制作执行/内部执行脚本与Prompt表_v01.xlsx`
+- `首帧Prompt`, optional `中间关键帧Prompt`, optional `结尾帧Prompt`
+- `生成前执行说明`
+- `视频内容Prompt（含声音/负面）`
+- keyframe skip/reuse decisions
+- validation result from `validate_prompt_detail.py`
+
+Boundary rules kept by 韦斯安德森:
+- client-facing workbooks must not expose internal prompt engineering
+- the main client confirmation workbook remains the source of truth for approved script and assets
+- if `镜头设计师` reports missing confirmations, update the client confirmation workbook before continuing
+- if middle keyframes are too similar, prefer first/end frames or skip the middle keyframe
+- do not connect keyframes or run video generation until prompt validation and visual QC pass
+
+After `镜头设计师` finishes, report:
+`本阶段已完成：内部逐镜Prompt表；当前阻塞：...；下一步请确认/生成：...`
 
 ## Project Folder Standard
 
-Keep first-level project folders stable, create optional folders only when the project actually needs them, and derive asset subfolders from the script instead of hardcoding project-specific categories.
+Do not make the folder template too rigid. First read and understand the script, extract likely asset categories, then create project-specific asset subfolders.
 
-Before scaffolding a project folder, read `references/project-folder-standard.md`.
+Keep first-level folders stable:
+
+```text
+项目文件夹/
+  00_项目说明_文件夹与命名规则.md
+  01_客户原始资料/
+    01_脚本/
+    02_产品素材/
+    03_用户反馈参考图/        # only when feedback/reference images exist
+    04_品牌素材/              # only when provided
+    05_字体授权/              # only when provided
+  02_用户确认文件/
+  03_设定资产/
+  04_最终确认归档/
+  05_内部制作执行/
+    01_首帧与关键帧/
+    02_视频片段/
+    03_成片/
+    04_封面/
+```
+
+Do not create a separate first-level `03_执行版脚本/` directory. If a confirmed text execution script is needed, keep it in `02_用户确认文件/` when it is user-facing, or keep the execution layer inside the internal workbook in `05_内部制作执行/`.
+
+Do not create empty placeholder folders. Create optional folders such as `03_用户反馈参考图/`, `04_品牌素材/`, `05_字体授权/`, or `05_内部制作执行/04_封面/` only when the project actually has those materials or deliverables.
+
+Do not create a generic `提示词参考` folder in the project structure. If a user provides a prompt reference file, use it to update the skill or prompt standard when appropriate, then archive the source only if the user explicitly wants to keep it.
+
+Create subfolders under `03_设定资产/` according to the actual script. Do not hardcode project-specific names such as `产品与法器设定` in the generic template. Product source materials belong under `01_客户原始资料/02_产品素材`; generated product-effect keyframes can go under a project-specific asset folder only when needed.
+
+Examples:
+
+```text
+西游/神话项目:
+  03_设定资产/
+    01_人物设定图/
+    02_场景设定图/
+    03_道具设定图/
+    04_特效关键帧/
+
+汽车广告:
+  03_设定资产/
+    01_车型外观参考/
+    02_场景设定图/
+    03_驾驶员形象/
+    04_动态特效关键帧/
+
+美妆广告:
+  03_设定资产/
+    01_人物模特设定/
+    02_产品质感参考/
+    03_场景氛围图/
+    04_质地特效关键帧/
+```
+
+Use `scripts/create_project.py` to scaffold the stable structure and create the initial confirmation workbook. If asset categories are already known, pass them with `--asset-subfolders`.
+
+Example:
+
+```bash
+python /Users/jude/.codex/skills/wes-anderson/scripts/create_project.py \
+  --project-name "海尔空调西游记AI短剧" \
+  --base-dir "$HOME/Desktop" \
+  --asset-subfolders "人物设定图,场景设定图,道具设定图,特效关键帧"
+```
 
 ## Automation Scripts
 
@@ -352,9 +433,9 @@ Use these scripts when possible instead of rebuilding the same Excel structure b
 ### Create Project
 
 ```bash
-python scripts/create_project.py \
+python /Users/jude/.codex/skills/wes-anderson/scripts/create_project.py \
   --project-name "项目名" \
-  --base-dir "/path/to/output-root" \
+  --base-dir "$HOME/Desktop" \
   --asset-subfolders "人物设定图,场景设定图,道具设定图,特效关键帧"
 ```
 
@@ -363,7 +444,7 @@ Creates the project folder structure and an initial `项目名_脚本与资产�
 ### Audit Script Workbook
 
 ```bash
-python scripts/audit_script.py \
+python /Users/jude/.codex/skills/wes-anderson/scripts/audit_script.py \
   --input "/path/to/client_script.xlsx" \
   --project-dir "/path/to/项目交付文件夹"
 ```
@@ -376,7 +457,7 @@ Creates `脚本审核确认表_v01.xlsx` with:
 ### Build Internal Asset Production Table
 
 ```bash
-python scripts/build_asset_prompt_table.py \
+python /Users/jude/.codex/skills/shot-designer/scripts/build_asset_prompt_table.py \
   --input "/path/to/脚本审核确认表_v01.xlsx" \
   --project-dir "/path/to/项目交付文件夹"
 ```
@@ -388,27 +469,17 @@ Use this right after script audit when the user wants to make actual character, 
 ### Build Internal Prompt Table
 
 ```bash
-python scripts/build_prompt_table.py \
+python /Users/jude/.codex/skills/shot-designer/scripts/build_prompt_table.py \
   --input "/path/to/项目名_脚本与资产确认表_v01.xlsx" \
   --project-dir "/path/to/项目交付文件夹"
 ```
 
 Creates `内部执行脚本与Prompt表_v01.xlsx`: one worksheet, one row per shot, with source script fields and extracted reference assets. Prompt-related cells are intentionally blank for the AI director pass.
 
-### Validate Workbook Structure
-
-```bash
-python scripts/validate_workbook_structure.py \
-  "/path/to/项目名_脚本与资产确认表_v01.xlsx" \
-  --type client
-```
-
-Use `--type internal-asset` for `设定资产制作表_v01.xlsx` and `--type internal-prompt` for `内部执行脚本与Prompt表_v01.xlsx`.
-
 ### Build Client Confirmation PDF
 
 ```bash
-python scripts/build_client_confirmation_pdf.py \
+python /Users/jude/.codex/skills/wes-anderson/scripts/build_client_confirmation_pdf.py \
   --project-dir "/path/to/项目交付文件夹" \
   --project-name "项目名" \
   --output "/path/to/04_最终确认归档/项目名_脚本与设定资产最终确认归档_v01.pdf"
@@ -419,10 +490,75 @@ manifest before rendering. Run `scripts/validate_client_facing_text.py` again be
 
 ## Failure Modes And Recovery
 
-When source material is incomplete, client confirmation is missing, official product assets are absent, prompt standards conflict, or generated workbooks cannot be validated, follow the explicit recovery branches in `references/failure-recovery.md`.
+Use these branches instead of guessing or silently continuing.
 
-Do not guess, silently continue, or treat unconfirmed downstream deliverables as approved.
+- If the client script has no recognizable shot table, then create a `资料解析问题确认表.xlsx` or a sheet in the audit workbook that lists the missing columns, the source filename, and the exact fields needed: `镜号`, `景别`, `画面内容`, `时长`, `台词/旁白`, `音效/音乐`, `备注`.
+- If the script is pasted text rather than a spreadsheet, then first convert it into a shot table with stable shot numbers, preserve the original pasted text in an archive/source sheet, and mark uncertain segmentation as `待确认`.
+- If shot duration is missing, then keep the shot, mark `时长=待确认`, and flag duration-sensitive risks instead of inventing seconds.
+- If dialogue is too long for the stated duration, then write a client-facing choice: shorten dialogue, extend duration, or move content to voiceover. Do not silently rewrite approved dialogue.
+- If official product images, logo, font authorization, brand rules, music, or voiceover references are missing, then mark each item as `待提供` in client-facing sheets and block final product-accurate prompts until provided.
+- If the user asks to generate product visuals without official product references, then create placeholder direction only and state that official assets override all generated imagery.
+- If the client confirmation workbook has not passed the second AI review, then fix or flag duration, dialogue, continuity, product logic, asset needs, and generation feasibility before prompt generation.
+- If an approved prompt reference conflicts with `镜头设计师/references/prompt_standard.md`, then ask whether to固化 the reference. If approved, update both `镜头设计师/references/prompt_standard.md` and the relevant prompt-building script; otherwise apply it only to the current workbook.
+- If a client changes a confirmed visual after preview/sample generation, then record sample version, affected shots/assets, affected duration, reason, rework action, and status before updating downstream prompts or assets.
+- If a generated workbook cannot be validated manually, then open it with a spreadsheet library, verify worksheet names, first-row headers, required columns, file path, and row count before telling the user it is complete.
 
-## Delivery Rules Reference
+## Naming Rules
 
-For detailed filename examples, client-facing language rules, anti-patterns, and hard delivery rules, read `references/delivery-rules.md` before creating final workbooks, PDFs, or production assets.
+Use versioned filenames. Do not overwrite old versions.
+
+Examples:
+- `项目名_脚本与资产确认表_v01.xlsx`
+- `设定资产制作表_v01.xlsx`
+- `角色_孙悟空_三视图_无文字_v01.png`
+- `角色_孙悟空_大头照_无文字_v01.png`
+- `角色_孙悟空_全身照_无文字_v01.png`
+- `场景_黄风岭_设定图_v01.png`
+- `产品_海尔洗空气空调_官方参考_v01.png`
+- `归档_客户最终确认_v01.pdf`
+- `内部执行脚本与Prompt表_v01.xlsx`
+- `封面_项目名_主题_v01.png`
+
+## Client vs Internal Language
+
+Use client-neutral names in deliverables:
+- `脚本审核确认表`
+- `脚本与资产确认表`
+- `设定资产确认表`
+- `客户最终确认PDF`
+
+Reserve stronger internal language for internal notes only:
+- `导演判断`
+- `镜头执行风险`
+- `设定资产制作表`
+- `Prompt执行表`
+- `制作状态`
+
+## Anti-Patterns / Blacklist
+
+Do not do these:
+
+- Do not skip client confirmation checkpoints to produce downstream files faster.
+- Do not treat preview character, scene, product, prop, or effect images as approved production assets before they are referenced back in the client confirmation workbook and confirmed.
+- Do not ask the client to confirm storyboards unless explicitly required.
+- Do not use AI-generated product appearance as final brand reference; official product assets override prompts.
+- Do not put internal image/video prompts in client-facing sheets; prompts belong in `设定资产制作表` or `内部执行脚本与Prompt表`.
+- Do not create a separate `02_视频Prompt` folder; the prompt workbook belongs directly under `05_内部制作执行/`.
+- Do not create a separate top-level `03_执行版脚本/` folder or standalone `执行版脚本.xlsx` unless explicitly requested.
+- Do not move `03_设定资产` under `05_内部制作执行`; use a lightweight reference entry when execution needs access.
+- Do not create nested current-version folders such as `第一版启用` for active assets; keep current assets flat and move old versions to `90_历史版本/`.
+- Do not mix internal costing, settlement, workload, or billing wording into user-facing archives.
+- Do not write accusatory client-facing wording such as `浪费`, `要钱`, `废弃`, or `用户行为导致`.
+- Do not overwrite old versions; create a new `_vNN` filename.
+- Do not claim a workbook or PDF is complete without checking that required sheets, columns, and source references are present.
+
+## Hard Rules
+
+- Before PDF, keep documents editable in Excel.
+- In client confirmation Excel files, keep `脚本审核确认表` and `形象场景描述确认表` as the first two worksheet tabs.
+- In client-facing Excel files, center short structured fields and left-align long descriptive text fields.
+- Do not ask the client to confirm storyboards unless explicitly required.
+- Preview character/scene images may be generated for confirmation, but they must be marked `预览/待确认` until approved.
+- Do not use AI-generated product appearance as final brand reference; official product assets override prompts.
+- Always keep original script content visible somewhere in execution deliverables for comparison.
+- For every final prompt, state required reference assets and non-negotiable constraints.

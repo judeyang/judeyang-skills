@@ -75,7 +75,7 @@
 或使用支持 GitHub 安装的 skills runtime：
 
 ```bash
-npx skills add https://github.com/judeyang/judeyang-skills/tree/main/wes-anderson
+npx skills add judeyang/wes-anderson-skill
 ```
 
 ---
@@ -103,31 +103,16 @@ npx skills add https://github.com/judeyang/judeyang-skills/tree/main/wes-anderso
 - 缺少客户素材时标记为 `待提供`，不写成已经确认。
 - 不生成额外命名示例文档；命名说明统一维护在 `00_项目说明_文件夹与命名规则.md`。
 
-## 校验与回归
-
-新增的回归资产用于 Darwin 或人工检查：
-
-- `test-prompts.json`：覆盖客户脚本审核、内部资产制作表、样片后客户修改记录。
-- `examples/`：包含示例脚本和期望工作簿结构。
-- `scripts/validate_workbook_structure.py`：校验客户确认表、内部资产表、内部 Prompt 表的工作簿结构。
-- `references/failure-recovery.md`、`references/project-folder-standard.md`、`references/prompt-workbook-rules.md`：从主 `SKILL.md` 拆出的详细规则。
-
-```bash
-python scripts/validate_workbook_structure.py workbook.xlsx --type client
-python scripts/validate_workbook_structure.py workbook.xlsx --type internal-asset
-python scripts/validate_workbook_structure.py workbook.xlsx --type internal-prompt
-```
-
 ---
 
 ## 🔴 检查点
 
 以下情况必须先确认再继续：
 
-- 生成执行版脚本前，客户脚本审核意见还没有确认。
-- 生成角色、场景、产品、道具或特效图片前，文字设定方向还没有确认。
+- 把脚本视为已确认前，客户脚本审核意见还没有确认。
+- 把角色、场景、产品、道具或特效图片提交给用户前，图片还没有回填到 `项目名_脚本与资产确认表_v01.xlsx`。
 - 创建最终确认 PDF 前，脚本、视觉方向和资产图还没有确认。
-- 修改 `references/prompt_standard.md` 或 `scripts/` 下脚本前，用户没有明确同意。
+- 修改 `镜头设计师` 的 `references/prompt_standard.md` 或 Prompt 脚本前，用户没有明确同意。
 - 需要公开发布、发送客户或写入生产目录。
 
 ---
@@ -141,28 +126,17 @@ wes-anderson/
 ├── README_EN.md
 ├── agents/
 │   └── openai.yaml
-├── examples/
-│   ├── expected-workbook-structure.md
-│   └── sample-script.md
 ├── references/
 │   ├── audit_checklist.md
-│   ├── client_facing_doc_standard.md
-│   ├── delivery-rules.md
-│   ├── failure-recovery.md
-│   ├── project-folder-standard.md
-│   ├── prompt-workbook-rules.md
-│   └── prompt_standard.md
-├── scripts/
-│   ├── audit_script.py
-│   ├── build_asset_prompt_table.py
-│   ├── build_client_confirmation_pdf.py
-│   ├── build_prompt_table.py
-│   ├── create_project.py
-│   ├── validate_client_facing_text.py
-│   ├── validate_prompt_detail.py
-│   └── validate_workbook_structure.py
-└── test-prompts.json
+│   └── client_facing_doc_standard.md
+└── scripts/
+    ├── audit_script.py
+    ├── build_client_confirmation_pdf.py
+    ├── create_project.py
+    └── validate_client_facing_text.py
 ```
+
+Prompt 标准、Prompt 表生成和 Prompt 校验已迁移到 `镜头设计师` skill。
 
 ---
 

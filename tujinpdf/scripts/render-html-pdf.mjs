@@ -36,6 +36,8 @@ if (!fs.existsSync(inputHtml)) {
 function loadPuppeteer() {
   const candidates = [
     process.cwd(),
+    '/Users/jude/同步空间/作品集/APP/bazi/fatepaw',
+    '/Users/jude/同步空间/作品集/APP/bazi/backend-dev',
   ];
   for (const dir of candidates) {
     try {

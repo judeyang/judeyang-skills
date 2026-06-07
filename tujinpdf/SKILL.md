@@ -57,7 +57,7 @@ HTML 必须保留，因为后续改版要直接在原 HTML 上升级，不要每
 
 1. **读取输入**：确认源文件路径、文本内容、目标读者、是否需要保留全部内容。
 2. **提取结构**：识别标题、日期、元信息、章节、表格、列表、关键数字和附件说明。
-3. **生成 HTML**：优先从 `templates/base-a4.html` 复制结构，再填入 A4 页面、土金色系变量、封面、页眉页脚、章节和表格样式。
+3. **生成 HTML**：使用 A4 页面、土金色系变量、封面、页眉页脚、章节和表格样式。
 4. **渲染 PDF**：运行 `scripts/render-html-pdf.mjs` 输出 PDF 和预览截图。
 5. **质量检查**：检查 PDF 可打开、页数合理、文本可提取、截图无明显溢出重叠。
 6. **交付说明**：说明生成了哪些文件、是否改动原文、未验证项和下一步可改什么。
@@ -105,16 +105,10 @@ HTML 必须保留，因为后续改版要直接在原 HTML 上升级，不要每
 - `.prod`
 - 细线表格
 
-可复用资源：
+可参考 FatePaw 模板的视觉语言，但不要继承其命理业务内容：
 
-- `templates/base-a4.html`：A4 HTML 起始模板，包含土金色变量、封面、章节、表格和打印分页基础样式。
-- `scripts/render-html-pdf.mjs`：真实浏览器渲染脚本，输出 PDF 和可选截图。
-- `scripts/validate-output.mjs`：交付前结构校验脚本，检查 HTML/PDF/预览图、A4 合同、占位符和明显调试痕迹。
-- `examples/`：最小样例输入和期望输出说明，用于回归测试。
-- `test-prompts.json`：Darwin/人工评估用触发样例，覆盖新建排版、续改修复和敏感商业内容。
-- `references/fatepaw-style-notes.md`：只作为土金视觉语言参考，不继承命理业务内容。
-
-可参考 `references/fatepaw-style-notes.md` 中沉淀的视觉语言，但不要继承其命理业务内容或任何私有项目路径。
+- `/Users/jude/同步空间/作品集/APP/bazi/fatepaw/src/templates/pet-reading-pdf-zh.html`
+- `/Users/jude/同步空间/作品集/APP/bazi/fatepaw/src/templates/human-reading-pdf-zh.html`
 
 ## Content Rules
 
@@ -155,7 +149,7 @@ HTML 必须保留，因为后续改版要直接在原 HTML 上升级，不要每
 使用真实浏览器渲染，不用 ReportLab 手搓 PDF。
 
 ```bash
-node scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
+node /Users/jude/.codex/skills/tujinpdf/scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
 ```
 
 脚本会优先使用可用的 Puppeteer；如果 Puppeteer 自带 Chrome 缺失，会尝试本机 Chrome：
@@ -176,12 +170,6 @@ node scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
 - 原文内容没有被静默改写。
 - 生成的 PDF 和 HTML 文件名版本一致；
 - 如果生成了截图，截图中首页标题、正文和表格没有明显裁切。
-
-可用结构检查：
-
-```bash
-node scripts/validate-output.mjs output.html output.pdf preview.png
-```
 
 可用文本检查：
 

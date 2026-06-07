@@ -1,0 +1,8 @@
+interface:
+  display_name: "镜头设计师"
+  short_description: "逐镜首尾帧、关键帧和视频Prompt设计"
+  brand_color: "#6B4E2E"
+  default_prompt: "Use $shot-designer to design production-ready per-shot image and video prompts."
+
+policy:
+  allow_implicit_invocation: true

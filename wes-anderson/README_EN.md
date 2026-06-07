@@ -76,7 +76,7 @@ Place this directory under a runtime that supports Agent Skills:
 Or use a runtime that supports GitHub-based skill installation:
 
 ```bash
-npx skills add https://github.com/judeyang/judeyang-skills/tree/main/wes-anderson
+npx skills add judeyang/wes-anderson-skill
 ```
 
 ---
@@ -104,31 +104,16 @@ Create a per-shot video prompt table from the client confirmation workbook.
 - Missing client materials must be marked as `待提供`, not as confirmed.
 - Do not create extra naming-example documents; keep naming guidance in `00_项目说明_文件夹与命名规则.md`.
 
-## Validation And Regression
-
-The new regression assets support Darwin or manual review:
-
-- `test-prompts.json`: covers client script audit, internal asset production tables, and post-sample client revision tracking.
-- `examples/`: contains a sample script and expected workbook structure.
-- `scripts/validate_workbook_structure.py`: validates client, internal-asset, and internal-prompt workbook structures.
-- `references/failure-recovery.md`, `references/project-folder-standard.md`, and `references/prompt-workbook-rules.md`: detailed rules split out from the main `SKILL.md`.
-
-```bash
-python scripts/validate_workbook_structure.py workbook.xlsx --type client
-python scripts/validate_workbook_structure.py workbook.xlsx --type internal-asset
-python scripts/validate_workbook_structure.py workbook.xlsx --type internal-prompt
-```
-
 ---
 
 ## 🔴 Checkpoints
 
 Pause for confirmation before continuing when:
 
-- the execution script would be created before script audit feedback is confirmed
-- character, scene, product, prop, or effect images would be generated before text direction is confirmed
+- the script would be treated as approved before script audit feedback is confirmed
+- character, scene, product, prop, or effect images would be submitted to the client before being referenced back in `项目名_脚本与资产确认表_v01.xlsx`
 - the final confirmation PDF would be created before the script, visual direction, and asset images are confirmed
-- `references/prompt_standard.md` or scripts under `scripts/` would be changed without explicit approval
+- `镜头设计师/references/prompt_standard.md` or prompt scripts would be changed without explicit approval
 - files must be publicly published, sent to a client, or written into a production directory
 
 ---
@@ -142,28 +127,17 @@ wes-anderson/
 ├── README_EN.md
 ├── agents/
 │   └── openai.yaml
-├── examples/
-│   ├── expected-workbook-structure.md
-│   └── sample-script.md
 ├── references/
 │   ├── audit_checklist.md
-│   ├── client_facing_doc_standard.md
-│   ├── delivery-rules.md
-│   ├── failure-recovery.md
-│   ├── project-folder-standard.md
-│   ├── prompt-workbook-rules.md
-│   └── prompt_standard.md
-├── scripts/
-│   ├── audit_script.py
-│   ├── build_asset_prompt_table.py
-│   ├── build_client_confirmation_pdf.py
-│   ├── build_prompt_table.py
-│   ├── create_project.py
-│   ├── validate_client_facing_text.py
-│   ├── validate_prompt_detail.py
-│   └── validate_workbook_structure.py
-└── test-prompts.json
+│   └── client_facing_doc_standard.md
+└── scripts/
+    ├── audit_script.py
+    ├── build_client_confirmation_pdf.py
+    ├── create_project.py
+    └── validate_client_facing_text.py
 ```
+
+Prompt standards, prompt workbook generation, and prompt validation now live in the `镜头设计师` skill.
 
 ---
 

@@ -71,7 +71,7 @@
 或使用支持 GitHub 安装的 skills runtime：
 
 ```bash
-npx skills add https://github.com/judeyang/judeyang-skills/tree/main/tujinpdf
+npx skills add judeyang/tujinpdf
 ```
 
 ---
@@ -130,18 +130,6 @@ node scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
 
 脚本会优先使用可用的 Puppeteer；如果 Puppeteer 自带 Chrome 缺失，会尝试本机 Chrome。
 
-## 校验与回归
-
-新增的回归资产用于 Darwin 或人工检查：
-
-- `test-prompts.json`：覆盖新建排版、续改修复、敏感商业内容。
-- `examples/`：包含最小样例输入和期望输出说明。
-- `scripts/validate-output.mjs`：检查 HTML/PDF/预览图、A4 页面合同、占位符和调试痕迹。
-
-```bash
-node scripts/validate-output.mjs output.html output.pdf preview.png
-```
-
 ---
 
 ## 质量门槛
@@ -194,17 +182,10 @@ tujinpdf/
 ├── README_EN.md
 ├── agents/
 │   └── openai.yaml
-├── examples/
-│   ├── expected-output-notes.md
-│   └── sample-report.md
 ├── references/
 │   └── fatepaw-style-notes.md
-├── templates/
-│   └── base-a4.html
-├── scripts/
-│   ├── render-html-pdf.mjs
-│   └── validate-output.mjs
-└── test-prompts.json
+└── scripts/
+    └── render-html-pdf.mjs
 ```
 
 ---

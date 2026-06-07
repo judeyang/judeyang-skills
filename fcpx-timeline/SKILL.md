@@ -15,7 +15,7 @@ Create a Final Cut Pro XML timeline from one local media folder, sorted by captu
 2. Generate the full timeline with still conversion:
 
 ```bash
-python3 scripts/make_timeline.py "/path/to/media-folder" \
+python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/to/media-folder" \
   --out "/path/to/output-folder/timeline.fcpxml" \
   --photo-duration 2 \
   --convert-stills \
@@ -24,7 +24,6 @@ python3 scripts/make_timeline.py "/path/to/media-folder" \
 
 3. Tell the user to import `timeline.fcpxml` into Final Cut Pro.
 4. Mention that converted stills live next to the XML in `timeline_stills/`; the folder must stay available for FCP relinking/import.
-5. Run `scripts/validate-fcpxml.py` before delivery when the XML exists locally.
 
 ## Rules Encoded In The Script
 
@@ -47,12 +46,6 @@ brew install exiftool ffmpeg
 The script also uses macOS `sips` for image conversion when `--convert-stills` is enabled.
 
 ## Validation
-
-First run the bundled structural and frame-boundary validator:
-
-```bash
-python3 scripts/validate-fcpxml.py "/path/to/output-folder/timeline.fcpxml" --fps 30
-```
 
 After generation, validate the XML if Final Cut Pro is installed:
 
@@ -81,24 +74,19 @@ for m in re.finditer(r'(duration|offset|start|tcStart)="([^"]+)"', p.read_text()
 PY
 ```
 
-Regression resources:
-
-- `examples/`: sample manifest and expected timeline behavior.
-- `test-prompts.json`: Darwin/人工评估 prompts for mixed media, FCP import rejection, and missing metadata tools.
-
 ## Troubleshooting Outputs
 
 If Final Cut Pro rejects the full timeline, generate narrow test files:
 
 ```bash
-python3 scripts/make_timeline.py "/path/to/media-folder" \
+python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/to/media-folder" \
   --out "/path/to/output-folder/timeline_video_only.fcpxml" \
   --video-only \
   --manifest "/path/to/output-folder/timeline_video_only_manifest.json"
 ```
 
 ```bash
-python3 scripts/make_timeline.py "/path/to/media-folder" \
+python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/to/media-folder" \
   --out "/path/to/output-folder/timeline_photos_only.fcpxml" \
   --photos-only \
   --convert-stills \
@@ -106,26 +94,6 @@ python3 scripts/make_timeline.py "/path/to/media-folder" \
 ```
 
 Use the results to isolate whether the issue is video import, still-image import, or mixed timeline import.
-
-## Failure Branches
-
-- If the source folder is missing, empty, or not readable, stop and ask for a valid folder path; do not create an empty timeline.
-- If `exiftool` is missing, continue with filesystem timestamps, but tell the user capture-time ordering may be less accurate and recommend `brew install exiftool`.
-- If `ffprobe` is missing, continue with conservative duration fallback, but tell the user video duration accuracy may be reduced and recommend `brew install ffmpeg`.
-- If Live Photo detection looks wrong, generate a manifest and inspect still/video filename pairs before rerunning with the full timeline.
-- If Final Cut Pro rejects the generated XML, first try `--video-only`, then `--photos-only --convert-stills`, then compare the manifests to isolate the failing media class.
-- If still images fail to relink or import, rerun with `--convert-stills` and keep `timeline_stills/` next to the `.fcpxml`.
-- If Final Cut Pro reports frame-boundary warnings, rerun using the intended `--fps` and run the frame-boundary validation snippet before delivering.
-- If media files live on an external drive or cloud-synced folder, tell the user the drive/folder must remain mounted and available when importing into Final Cut Pro.
-
-## Anti-Patterns And Blacklist
-
-- Do not hand-write FCPXML when `scripts/make_timeline.py` can generate it.
-- Do not delete, move, rename, or normalize the user's original media files.
-- Do not commit or publish user media, generated timelines, converted stills, manifests, or local absolute paths.
-- Do not claim capture-time ordering is exact when metadata is missing or inconsistent.
-- Do not ignore Final Cut Pro import errors; isolate video-only, photos-only, and mixed timeline paths.
-- Do not leave the user with only the XML when still conversion was used; mention that `timeline_stills/` is required for relinking/import.
 
 
 ## 达尔文运行护栏
