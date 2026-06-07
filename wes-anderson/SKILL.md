@@ -33,6 +33,17 @@ When a client-facing confirmation table is missing source material from the clie
 
 Before creating files, identify the current project phase and the exact input source.
 
+## Related Skills
+
+This skill delegates specialized work to companion skills:
+
+- Required for prompt production: `镜头设计师` / `shot-designer`. Asset prompt workbooks, internal per-shot prompt workbooks, final video prompt standards, and prompt validation live there.
+- Recommended for final user-facing archive PDFs: `土金PDF` / `tujinpdf`.
+
+If `镜头设计师` is not installed and the user asks for asset prompts, first/end/keyframe prompts, or per-shot video prompts, stop and tell the user to install `shot-designer` from the same `judeyang-skills` repository before continuing. Do not fall back to the old embedded prompt rules.
+
+If `tujinpdf` is not installed and the user asks for the final styled PDF archive, ask whether to install/use `tujinpdf` or produce a simpler PDF with the available document tooling.
+
 Required phase inputs:
 - Script audit: client script file or pasted script content.
 - Internal asset production branch: client confirmation workbook or parsed script shots; this is for the producer, not the client.

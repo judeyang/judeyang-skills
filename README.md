@@ -26,7 +26,7 @@
 
 JudeYang 自用并开源的 Agent Skills 合集：**土金PDF、韦斯安德森视频工作流、镜头设计师、FCPXML 时间线工具**。
 
-这些 skill 来自真实工作流，不是演示项目。每个目录都是一个可独立安装的 skill，包含自己的 `SKILL.md`、README、脚本、参考资料、`test-prompts.json`、`examples/` 和可运行校验脚本，方便用 Darwin 或人工回归检查持续迭代。
+这些 skill 来自真实工作流，不是演示项目。每个目录都是一个可独立安装的 skill，包含自己的 `SKILL.md`、README、脚本、参考资料、示例和可运行校验脚本。
 
 ![Workflow map](assets/collection-workflow.svg)
 
@@ -57,7 +57,7 @@ cp -R judeyang-skills/shot-designer ~/.codex/skills/
 cp -R judeyang-skills/fcpx-timeline ~/.codex/skills/
 ```
 
-### 三个 skill
+### 四个 skill
 
 **土金PDF**
 
@@ -77,8 +77,7 @@ cp -R judeyang-skills/fcpx-timeline ~/.codex/skills/
 
 ### 质量控制
 
-- 每个 skill 都有 `test-prompts.json`，用于 Darwin 或人工回归评估。
-- 每个 skill 都有 `examples/`，用于说明最小输入和期望输出。
+- 每个 skill 都配套示例，用于说明最小输入和期望输出。
 - 每个 skill 都有 validator，交付前可运行检查结构、格式或输出合同。
 - README 和 `SKILL.md` 保持同步，避免 GitHub 首页和实际使用说明脱节。
 
@@ -88,7 +87,7 @@ cp -R judeyang-skills/fcpx-timeline ~/.codex/skills/
 
 JudeYang's open-source Agent Skills collection: **TuJin PDF, Wes Anderson video workflow, Shot Designer, and FCPXML timeline tools**.
 
-These skills come from real production workflows, not demos. Each subdirectory is independently installable and includes its own `SKILL.md`, README, scripts, references, `test-prompts.json`, `examples/`, and runnable validators for Darwin or manual regression checks.
+These skills come from real production workflows, not demos. Each subdirectory is independently installable and includes its own `SKILL.md`, README, scripts, references, examples, and runnable validators.
 
 ![Workflow map](assets/collection-workflow.svg)
 
@@ -139,8 +138,7 @@ Scans a local media folder, sorts videos, photos, and Live Photos by capture tim
 
 ### Quality Control
 
-- Every skill includes `test-prompts.json` for Darwin or manual regression scoring.
-- Every skill includes `examples/` to document minimal inputs and expected outputs.
+- Every skill includes examples to document minimal inputs and expected outputs.
 - Every skill includes a validator for checking structure, format, or output contracts before delivery.
 - README files and `SKILL.md` stay synchronized so the GitHub homepage matches the actual workflow.
 

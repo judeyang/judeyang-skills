@@ -66,17 +66,29 @@
 
 ## 安装
 
-把本目录放到支持 Agent Skills 的 skills 目录下：
+本 skill 已迁入统一仓库 `judeyang/judeyang-skills`。安装 `韦斯安德森` 时，请同时安装 `shot-designer`；否则进入设定资产 Prompt、首尾帧/关键帧 Prompt、逐镜视频 Prompt 阶段时会缺少依赖。
+
+推荐一起安装：
 
 ```bash
-~/.codex/skills/wes-anderson/
+git clone https://github.com/judeyang/judeyang-skills.git
+cp -R judeyang-skills/wes-anderson ~/.codex/skills/
+cp -R judeyang-skills/shot-designer ~/.codex/skills/
+cp -R judeyang-skills/tujinpdf ~/.codex/skills/
 ```
 
-或使用支持 GitHub 安装的 skills runtime：
+最低安装：
 
 ```bash
-npx skills add judeyang/wes-anderson-skill
+cp -R judeyang-skills/wes-anderson ~/.codex/skills/
+cp -R judeyang-skills/shot-designer ~/.codex/skills/
 ```
+
+依赖说明：
+- `shot-designer`：必需。负责 Prompt 标准、Prompt 表生成和 Prompt 校验。
+- `tujinpdf`：推荐。用于最终用户版确认/归档 PDF；没有它也可以改用普通 PDF 工具。
+
+如果运行环境只安装了 `wes-anderson`，通常不会自动弹出系统级依赖安装提示；需要 README 或本 skill 在执行到 Prompt 阶段时明确提醒补装。
 
 ---
 

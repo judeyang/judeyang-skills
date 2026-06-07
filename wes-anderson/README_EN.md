@@ -67,17 +67,29 @@ Client script → Script audit → Client confirmation → Assets → Per-shot p
 
 ## Installation
 
-Place this directory under a runtime that supports Agent Skills:
+This skill now lives in the unified `judeyang/judeyang-skills` repository. Install `shot-designer` together with `wes-anderson`; otherwise asset prompts, first/end/keyframe prompts, per-shot video prompts, and prompt validation will be missing.
+
+Recommended installation:
 
 ```bash
-~/.codex/skills/wes-anderson/
+git clone https://github.com/judeyang/judeyang-skills.git
+cp -R judeyang-skills/wes-anderson ~/.codex/skills/
+cp -R judeyang-skills/shot-designer ~/.codex/skills/
+cp -R judeyang-skills/tujinpdf ~/.codex/skills/
 ```
 
-Or use a runtime that supports GitHub-based skill installation:
+Minimum installation:
 
 ```bash
-npx skills add judeyang/wes-anderson-skill
+cp -R judeyang-skills/wes-anderson ~/.codex/skills/
+cp -R judeyang-skills/shot-designer ~/.codex/skills/
 ```
+
+Dependency notes:
+- `shot-designer`: required. Owns prompt standards, prompt workbook generation, and prompt validation.
+- `tujinpdf`: recommended. Used for final user-facing confirmation/archive PDFs; without it, use a simpler available PDF workflow.
+
+If a runtime installs only `wes-anderson`, it will usually not show an automatic system-level dependency prompt. The skill must tell the user to install the companion skill when the workflow reaches prompt production.
 
 ---
 
