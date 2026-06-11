@@ -1,45 +1,17 @@
 [
   {
-    "id": "markdown-to-a4-magazine-pdf",
-    "prompt": "把这个 Markdown 项目复盘转换成土金色系 A4 杂志风 PDF，保留事实和标题层级，输出 HTML、PDF 和首页预览图。",
-    "expected_behavior": [
-      "ask for or locate the source Markdown file before rendering",
-      "use the A4 page contract from SKILL.md and templates/base-a4.html",
-      "keep source facts unchanged unless the user explicitly asks for rewriting",
-      "render PDF and screenshot, then inspect for overflow and clipped text"
-    ],
-    "must_not": [
-      "invent missing data",
-      "deliver only HTML without rendering verification",
-      "change brand facts, prices, dates, or claims"
-    ]
+    "id": "pdf-001",
+    "prompt": "把这份项目最终确认内容做成土金PDF客户确认归档，保留HTML源文件和同名PDF。",
+    "expected": "识别为客户确认归档；不改原文；输出版本一致的HTML/PDF；检查客户可见内容不含内部Prompt和工具信息。"
   },
   {
-    "id": "fix-existing-layout-overflow",
-    "prompt": "这个土金 PDF 的 HTML 已经有了，但是打印出来文字溢出，帮我修到能稳定导出。",
-    "expected_behavior": [
-      "edit the existing HTML/CSS rather than rebuilding unrelated content",
-      "preserve the user's current visual direction",
-      "rerender PDF and preview after the fix",
-      "report the exact output files"
-    ],
-    "must_not": [
-      "silently delete sections to make the page fit",
-      "skip visual verification"
-    ]
+    "id": "pdf-002",
+    "prompt": "这个PDF表格溢出了，只修版式，不要动内容。",
+    "expected": "识别为样式修复；只改HTML/CSS表格分页/列宽/字号；重新渲染并截图检查。"
   },
   {
-    "id": "sensitive-commercial-content",
-    "prompt": "把这份报价合同整理成土金 PDF，里面的价格和交付条款不能改。",
-    "expected_behavior": [
-      "treat prices, dates, deliverables, and legal wording as locked facts",
-      "only improve layout, hierarchy, and typography",
-      "ask before any semantic rewrite",
-      "keep a source-to-output trace for important clauses"
-    ],
-    "must_not": [
-      "summarize away contract clauses",
-      "rewrite commercial commitments without confirmation"
-    ]
+    "id": "pdf-003",
+    "prompt": "把分镜脚本和资产图整理成设定集PDF。",
+    "expected": "识别为资产设定集或分镜脚本归档；图片缺失标待提供/待确认；长表格自然分页。"
   }
 ]

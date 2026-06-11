@@ -1,44 +1,17 @@
 [
   {
-    "id": "client-script-audit-workbook",
-    "prompt": "这是客户给的 AI 短剧脚本，帮我做脚本审核和脚本与资产确认表，给客户确认用。",
-    "expected_behavior": [
-      "identify the source script and current phase before writing files",
-      "create a client-facing workbook with 脚本审核确认表 first and 形象场景描述确认表 second",
-      "mark missing product/logo/font/music/materials as 待提供",
-      "include client decision columns and block downstream prompt generation until confirmation"
-    ],
-    "must_not": [
-      "put internal Prompt production language in the client-facing workbook",
-      "treat unconfirmed script changes as approved"
-    ]
+    "id": "project_start",
+    "prompt": "我刚接了一个卡萨帝空调西游记AI短剧项目，客户给了脚本和产品图，我要开始做，韦斯安德森项目领航。",
+    "expected": "Treat 韦斯安德森项目领航 as the project-pilot skill, not a director-style visual prompt. End with exactly four lines starting with 本阶段已完成：, CHECKPOINT · 当前需要你确认/提供：, 确认后我将进入：, 暂不执行的内容：. Do not generate prompts or video."
   },
   {
-    "id": "internal-asset-production-table",
-    "prompt": "客户要先看人物和场景设定图，帮我出内部设定资产制作表和生成 Prompt。",
-    "expected_behavior": [
-      "place the workbook under 05_内部制作执行",
-      "write or revise actual asset prompts after reading script context",
-      "separate producer-facing prompt work from client-facing confirmation files",
-      "tell the user that generated images must be回填到确认表 before client confirmation"
-    ],
-    "must_not": [
-      "put 设定资产制作表 into 02_用户确认文件",
-      "present internal prompts as final client-approved deliverables"
-    ]
+    "id": "skip_to_video_prompts",
+    "prompt": "继续。客户确认人物和场景图都可以了，现在直接帮我出逐镜视频Prompt表。",
+    "expected": "Enforce the final confirmation archive gate. Do not generate the per-shot prompt table until 04_最终确认归档 has final PDF/HTML confirmation archive. End with the exact four-line status block."
   },
   {
-    "id": "client-revision-after-sample",
-    "prompt": "客户看完 5 秒样片后要求改角色服装颜色，你帮我记录修改意见并更新后续表。",
-    "expected_behavior": [
-      "record original client wording, sample version, affected shots/assets, and affected duration",
-      "use neutral client-facing wording for affected generated duration",
-      "update downstream confirmation or prompt workbook only after recording the revision",
-      "state which files are affected and what remains blocked"
-    ],
-    "must_not": [
-      "use accusatory wording in client-facing archive",
-      "merge separate feedback rounds into one vague note"
-    ]
+    "id": "client_revision_feedback",
+    "prompt": "客户又发来一批修改意见，说第3镜人物衣服要换，第8镜产品出现太突兀，还加了两张参考图。你先帮我处理一下。",
+    "expected": "Record feedback in 02_用户确认文件/用户修改意见记录_vNN.xlsx, use only whitelist project paths, and end with the exact four-line status block."
   }
 ]

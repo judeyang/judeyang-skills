@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import plistlib
+import re
 import shutil
 import subprocess
 import sys
@@ -23,6 +24,8 @@ VIDEO_EXTS = {".mov", ".mp4", ".m4v"}
 PHOTO_EXTS = {".jpg", ".jpeg", ".png", ".heic", ".heif"}
 LIVE_STILL_EXTS = {".heic", ".heif", ".jpg", ".jpeg"}
 SCAN_EXTS = VIDEO_EXTS | PHOTO_EXTS | LIVE_STILL_EXTS
+AI_SHOT_RE = re.compile(r"镜头\s*0*(\d+)")
+VERSION_RE = re.compile(r"_v(\d+)", re.I)
 
 DATE_TAGS = (
     "EXIF:DateTimeOriginal",
@@ -307,6 +310,50 @@ def build_items(paths: list[Path], photo_duration: Fraction) -> list[MediaItem]:
     return sorted(items, key=lambda item: (item.capture_time, item.path.name.lower()))
 
 
+def ai_shot_number(path: Path) -> int | None:
+    match = AI_SHOT_RE.search(path.stem)
+    return int(match.group(1)) if match else None
+
+
+def version_number(path: Path) -> int:
+    matches = VERSION_RE.findall(path.stem)
+    return max((int(match) for match in matches), default=0)
+
+
+def apply_ai_shot_order(items: list[MediaItem]) -> tuple[list[MediaItem], list[str]]:
+    shot_groups: dict[int, list[MediaItem]] = {}
+    unsorted: list[MediaItem] = []
+    for item in items:
+        shot = ai_shot_number(item.path)
+        if shot is None:
+            unsorted.append(item)
+            continue
+        shot_groups.setdefault(shot, []).append(item)
+
+    selected: list[MediaItem] = []
+    warnings: list[str] = []
+    for shot in sorted(shot_groups):
+        group = shot_groups[shot]
+        latest = sorted(
+            group,
+            key=lambda item: (version_number(item.path), item.path.stat().st_mtime, item.path.name.lower()),
+            reverse=True,
+        )[0]
+        selected.append(latest)
+        skipped = [item.path.name for item in group if item.path != latest.path]
+        if skipped:
+            warnings.append(f"镜头{shot:02d}: selected {latest.path.name}; skipped older/duplicate versions: {', '.join(skipped)}")
+
+    if shot_groups:
+        shot_numbers = sorted(shot_groups)
+        missing = [num for num in range(shot_numbers[0], shot_numbers[-1] + 1) if num not in shot_groups]
+        if missing:
+            warnings.append("Missing shot numbers: " + ", ".join(f"镜头{num:02d}" for num in missing))
+    if unsorted:
+        warnings.append("Unnumbered media kept after numbered shots: " + ", ".join(item.path.name for item in unsorted))
+    return selected + sorted(unsorted, key=lambda item: (item.capture_time, item.path.name.lower())), warnings
+
+
 def xml_attr(value: str) -> str:
     return escape(value, {'"': "&quot;"})
 
@@ -512,6 +559,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Convert/copy all photo placeholders to JPEG files next to the output before writing FCPXML.",
     )
+    parser.add_argument(
+        "--ai-shot-order",
+        action="store_true",
+        help="AI video mode: sort Chinese `镜头NN` filenames by shot number, keep the latest _vNN per shot, and warn on missing numbers.",
+    )
     return parser.parse_args()
 
 
@@ -535,6 +587,9 @@ def main() -> int:
         items = [item for item in items if item.kind in {"video", "live-video"}]
     if args.photos_only:
         items = [item for item in items if item.kind == "photo"]
+    warnings: list[str] = []
+    if args.ai_shot_order:
+        items, warnings = apply_ai_shot_order(items)
     if not items:
         print("No supported media found.", file=sys.stderr)
         return 1
@@ -545,6 +600,8 @@ def main() -> int:
             f"{index:03d}  {item.capture_time.isoformat()}  "
             f"{float(item.duration):8.3f}s  {item.kind}{live}  {item.path}"
         )
+    for warning in warnings:
+        print(f"WARNING: {warning}", file=sys.stderr)
 
     if args.manifest:
         write_manifest(items, args.manifest.expanduser())

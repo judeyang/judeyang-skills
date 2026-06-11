@@ -52,6 +52,112 @@ QUALITY_BOUNDARY_RE = re.compile(r"质量边界：(?P<body>.*?)(?:\n|$)")
 STYLE_IN_SHOT_SIZE_MARKERS = ["电影感", "史诗感", "高级感", "质感", "氛围"]
 CAMERA_IN_COMPOSITION_MARKERS = ["无人机", "俯拍", "仰拍", "平视", "低机位", "高机位", "贴地", "正面30度", "侧面30度"]
 PHOTOREALISM_TYPO_MARKERS = ["Photirealism", "Photorealisim", "Photorealstic"]
+NEXT_SHOT_HANDOFF_MARKERS = ["切到", "切入", "切吴用", "切晁盖", "切杨志", "转到", "转入", "下一镜", "下个镜头", "接吴用", "接晁盖", "接杨志"]
+HANDOFF_BOUNDARY_MARKERS = ["不生成下一镜", "不生成其他镜头", "不生成其他角色新动作", "不生成额外剧情", "本镜头停在"]
+SOURCE_TERM_SPLIT_RE = re.compile(r"[，。；、：：“”！!？?\s+\-—\n（）()]+")
+SOURCE_WEAK_TERMS = {
+    "画面",
+    "台词",
+    "表演",
+    "音效",
+    "音乐",
+    "镜头",
+    "声音",
+    "无",
+    "在",
+    "中",
+    "的",
+    "了",
+    "和",
+    "等人",
+    "边",
+    "继续",
+    "已经",
+    "开始",
+    "后期",
+    "合成",
+    "执行",
+    "内容",
+    "车上有",
+    "继续讲",
+    "很开心",
+}
+SOURCE_KEYWORDS = [
+    "黄泥冈",
+    "烈日",
+    "杨志",
+    "押送",
+    "生辰纲",
+    "旗帜",
+    "擦汗",
+    "暗处",
+    "草丛",
+    "晁盖",
+    "吴用",
+    "埋伏",
+    "怒视",
+    "压低声音",
+    "手机",
+    "展示",
+    "屏幕",
+    "产品",
+    "特效",
+    "不屑",
+    "抱臂",
+    "算账",
+    "占位",
+    "省电",
+    "数据",
+    "卖点",
+    "眼睛",
+    "微亮",
+    "嘴硬",
+    "点头",
+    "怀疑",
+    "心动",
+    "挠头",
+    "比划",
+    "幻想",
+    "梁山",
+    "好汉",
+    "吃肉",
+    "喝酒",
+    "推眼镜",
+    "愣",
+    "拍腿",
+    "拍大腿",
+    "转身",
+    "挥手",
+    "离开",
+    "齐声",
+    "口号",
+    "黑屏转场",
+    "原地",
+    "懵",
+    "远去",
+    "风",
+    "落叶",
+    "树林深处",
+    "喊话",
+    "独自",
+    "声嘶力竭",
+    "蝉鸣",
+    "车轮",
+    "紧张鼓点",
+    "华丽出场",
+    "哼",
+    "林间风声",
+    "归零",
+    "轻快",
+    "电子",
+    "树木沙沙声",
+    "树叶沙沙声",
+    "锣鼓",
+    "回声",
+    "欢快",
+    "乌鸦",
+    "渐弱",
+]
 
 
 def find_header(ws, name: str) -> tuple[int, int]:
@@ -70,6 +176,15 @@ def find_any_header(ws, names: list[str]) -> tuple[int, int]:
         except RuntimeError as exc:
             errors.append(str(exc))
     raise RuntimeError(" / ".join(errors))
+
+
+def maybe_find_header(ws, names: list[str]) -> int | None:
+    for name in names:
+        try:
+            return find_header(ws, name)[1]
+        except RuntimeError:
+            continue
+    return None
 
 
 def find_prompt_sheet(wb):
@@ -134,6 +249,75 @@ def label_value(block: str, label: str) -> str:
     return match.group("value").strip() if match else ""
 
 
+def normalize_source_text(value: str) -> str:
+    text = str(value or "")
+    text = re.sub(r"\s+", "", text)
+    return (
+        text.replace("“", '"')
+        .replace("”", '"')
+        .replace("‘", "'")
+        .replace("’", "'")
+        .replace("：", ":")
+    )
+
+
+def dialogue_fragments(dialogue: str) -> list[str]:
+    text = str(dialogue or "").strip()
+    if not text or text == "—":
+        return []
+    quoted = re.findall(r"[：:]“(.+?)”", text)
+    if quoted:
+        return quoted
+    return [text]
+
+
+def source_terms(text: str) -> list[str]:
+    seen: set[str] = set()
+    terms: list[str] = []
+    for part in SOURCE_TERM_SPLIT_RE.split(str(text or "")):
+        term = part.strip()
+        if len(term) < 2:
+            continue
+        if term in SOURCE_WEAK_TERMS:
+            continue
+        if term.startswith("待") or term.endswith("待提供"):
+            continue
+        if term not in seen:
+            seen.add(term)
+            terms.append(term)
+    return terms
+
+
+def source_term_present(term: str, prompt: str) -> bool:
+    normalized_term = normalize_source_text(term)
+    normalized_prompt = normalize_source_text(prompt)
+    if normalized_term in normalized_prompt:
+        return True
+    # A few production-safe equivalences used in prompt writing.
+    aliases = {
+        "树林风吹过": ["林间风声", "风声"],
+        "树木沙沙声": ["树叶沙沙声", "树叶", "沙沙声"],
+        "渐暗渐明黑屏转场": ["黑屏转场", "黑场转入"],
+        "一脸懵逼": ["一脸懵", "懵"],
+        "声嘶力竭": ["拖长声音", "喊话"],
+        "轻快电子音": ["轻快电子", "轻快电子点按声", "电子点按声"],
+        "林间风声": ["风声", "树林风声", "林间风"],
+        "回声欢快音乐收尾": ["回声", "欢快氛围", "收尾欢快"],
+        "吴用凑过来": ["吴用", "凑近"],
+        "特写手机屏幕": ["手机", "屏幕", "特写"],
+    }
+    if any(normalize_source_text(alias) in normalized_prompt for alias in aliases.get(term, [])):
+        return True
+    term_keywords = [keyword for keyword in SOURCE_KEYWORDS if keyword in term]
+    if term_keywords:
+        present_count = sum(1 for keyword in term_keywords if normalize_source_text(keyword) in normalized_prompt)
+        required_count = min(2, len(term_keywords))
+        return present_count >= required_count
+    if len(normalized_term) <= 4:
+        return normalized_term[:2] in normalized_prompt
+    return False
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -149,6 +333,9 @@ def main() -> int:
     first_col = find_header(ws, "首帧Prompt")[1]
     middle_col = find_header(ws, "中间关键帧Prompt")[1]
     end_col = find_header(ws, "结尾帧Prompt")[1]
+    picture_col = maybe_find_header(ws, ["确认后执行内容", "确认后执行画面", "执行版画面内容", "画面内容", "画面"])
+    dialogue_col = maybe_find_header(ws, ["台词/旁白", "确认后台词/旁白", "执行版台词/旁白", "台词"])
+    sfx_col = maybe_find_header(ws, ["音效/音乐", "音效", "音乐"])
     errors: list[str] = []
 
     for row in range(header_row + 1, ws.max_row + 1):
@@ -162,6 +349,18 @@ def main() -> int:
         middle_prompt = str(ws.cell(row, middle_col).value or "")
         end_prompt = str(ws.cell(row, end_col).value or "")
         keyframe_prompt_text = "\n".join([first_prompt, middle_prompt, end_prompt])
+        picture_text = str(ws.cell(row, picture_col).value or "") if picture_col else ""
+        dialogue_text = str(ws.cell(row, dialogue_col).value or "") if dialogue_col else ""
+        sfx_text = str(ws.cell(row, sfx_col).value or "") if sfx_col else ""
+        for fragment in dialogue_fragments(dialogue_text):
+            if normalize_source_text(fragment) not in normalize_source_text(prompt):
+                errors.append(f"镜头 {shot}: `台词/旁白` 中的完整台词未出现在视频Prompt中：{fragment}")
+        for term in source_terms(picture_text):
+            if not source_term_present(term, prompt):
+                errors.append(f"镜头 {shot}: `确认后执行内容` 要点未出现在视频Prompt中：{term}")
+        for term in source_terms(sfx_text):
+            if not source_term_present(term, prompt):
+                errors.append(f"镜头 {shot}: `音效/音乐` 要点未出现在视频Prompt中：{term}")
         for phrase in SOLID_COLOR_KEYFRAME_PHRASES:
             if phrase in keyframe_prompt_text or phrase in exec_note:
                 errors.append(f"镜头 {shot}: 纯黑/纯白/纯色占位画面不能作为 AI 关键帧生成，请改为视频或后期转场说明")
@@ -256,12 +455,18 @@ def main() -> int:
                     errors.append(f"镜头 {shot} 分镜 {index}: 缺少 `{label}`")
             shot_size = label_value(block, "景别：")
             composition = label_value(block, "构图：")
+            handoff = label_value(block, "衔接要求：")
             for marker in STYLE_IN_SHOT_SIZE_MARKERS:
                 if marker in shot_size:
                     errors.append(f"镜头 {shot} 分镜 {index}: `景别` 中包含风格词 `{marker}`，请移到【氛围与画质】")
             for marker in CAMERA_IN_COMPOSITION_MARKERS:
                 if marker in composition:
                     errors.append(f"镜头 {shot} 分镜 {index}: `构图` 中包含机位词 `{marker}`，请移到`机位`")
+            for marker in NEXT_SHOT_HANDOFF_MARKERS:
+                if marker in handoff:
+                    errors.append(f"镜头 {shot} 分镜 {index}: `衔接要求` 不应描述下一镜具体内容 `{marker}`；请只写本镜头结束边界")
+            if handoff and not any(marker in handoff for marker in HANDOFF_BOUNDARY_MARKERS):
+                errors.append(f"镜头 {shot} 分镜 {index}: `衔接要求` 应作为结束边界使用，建议写 `本镜头停在上述结束状态；不生成下一镜、其他角色新动作或额外剧情。`")
 
     if errors:
         print("\n".join(errors))

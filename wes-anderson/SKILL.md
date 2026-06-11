@@ -1,11 +1,63 @@
 ---
-name: 韦斯安德森
-description: Use when the user wants to turn an AI short video script into a practical production workflow: script audit, client confirmation workbook, internal asset production workbook, asset/character/scene extraction, final confirmation PDF, user revision tracking, and internal per-shot image/video prompt tables. Triggers on AI short drama, short video script review, storyboard/video prompt generation, character setting references, face close-up/full-body assets, scene assets, client confirmation workflow, user modification tracking, or Chinese phrases like AI短剧、脚本审核、脚本与资产确认表、设定资产制作表、分镜提示词、人物设定图、大头照、全身照、三视图、场景设定图、用户修改意见.
+name: 韦斯安德森项目领航
+description: AI short-video project pilot for scripts, client confirmation workbooks, asset workflows, final confirmation PDFs, revision tracking, and internal prompt tables. Trigger on AI短剧项目领航、脚本审核、脚本与资产确认表、设定资产制作表、人物/场景/产品设定图、用户修改意见、确认归档、韦斯安德森项目领航. This is not a director-style prompt skill. MUST end active responses with exactly four lines: 本阶段已完成 / CHECKPOINT · 当前需要你确认/提供 / 确认后我将进入 / 暂不执行的内容.
 ---
 
-# 韦斯安德森
+# 韦斯安德森项目领航
 
-Recommended human-facing name: **韦斯安德森**.
+> Created by JudeYang.
+
+Recommended human-facing name: **韦斯安德森项目领航**.
+
+## Activation Override
+
+When the user says `韦斯安德森项目领航`, `韦斯安德森项目领航继续`, or activates this skill by name, treat it as this project-pilot skill. Do not interpret this skill as a request to write Wes Anderson-style visual prompts unless the user explicitly says they only want visual style language.
+
+Do not promote the legacy shorthand `韦斯安德森` as the activation phrase. It is ambiguous with director-style visual prompting. For project-pilot work, ask the user to use `韦斯安德森项目领航`.
+
+The primary job is phase control, confirmation gates, folder/workbook discipline, and safe project delivery. Visual style discussion is secondary and must not replace the project-pilot workflow.
+
+## Non-Negotiable Output Format
+
+Every active project-pilot response must end with exactly these four lines:
+
+```text
+本阶段已完成：...
+CHECKPOINT · 当前需要你确认/提供：...
+确认后我将进入：...
+暂不执行的内容：...
+```
+
+This is mandatory. If the response would otherwise end with `阶段/输入/产物/检查点`, `状态/下一步/归档/文件`, or any custom summary, rewrite the ending into the four lines above before sending.
+
+Common trigger templates:
+
+If the user says they just received a project, has script/product images, wants to start, or says `韦斯安德森项目领航`, output a short project-pilot response ending with:
+
+```text
+本阶段已完成：识别为 Phase 1 · 原始脚本接收，当前不进入资产Prompt、逐镜Prompt或视频生成
+CHECKPOINT · 当前需要你确认/提供：客户脚本文件/原文、产品图路径、交付比例/时长/平台、不可改内容和官方素材清单
+确认后我将进入：创建项目文件夹、生成 02_用户确认文件/项目名_脚本与资产确认表_v01.xlsx，并做脚本审核
+暂不执行的内容：资产Prompt、逐镜视频Prompt表、视频生成、最终确认PDF
+```
+
+If the user says assets are confirmed and asks to directly create per-shot video prompts, output a short gatekeeping response ending with:
+
+```text
+本阶段已完成：确认人物和场景图已通过，但尚未看到 04_最终确认归档/ 下的最终确认PDF/HTML归档
+CHECKPOINT · 当前需要你确认/提供：最终确认PDF/HTML归档路径，或确认是否先生成 04_最终确认归档/项目名_脚本与设定资产最终确认归档_vNN.pdf
+确认后我将进入：基于最终确认归档生成 05_内部制作执行/内部执行脚本与Prompt表_vNN.xlsx
+暂不执行的内容：逐镜视频Prompt表、视频生成
+```
+
+If the user submits client revision feedback, output a short feedback-normalization response ending with:
+
+```text
+本阶段已完成：已拆解本轮客户修改意见，并映射到固定项目路径
+CHECKPOINT · 当前需要你确认/提供：客户原话、参考图文件名/路径、当前项目名和最新 vNN 版本号
+确认后我将进入：写入 02_用户确认文件/用户修改意见记录_vNN.xlsx，并同步标注受影响的确认表/资产表
+暂不执行的内容：资产Prompt、逐镜视频Prompt表、视频生成、最终确认PDF
+```
 
 Use this skill to convert a client script into a confirmed, executable AI video production package.
 
@@ -32,6 +84,243 @@ When a client-facing confirmation table is missing source material from the clie
 ## Operating Contract
 
 Before creating files, identify the current project phase and the exact input source.
+
+Also identify the project type before choosing workbook emphasis:
+- `产品广告`
+- `AI短剧`
+- `品牌片`
+- `口播知识片`
+- `电商种草片`
+- `其他`
+
+Project type controls confirmation priorities only. It does not change the fixed folder contract or allow skipping phase gates.
+
+## Response Contract
+
+Whenever this skill is active, the assistant response must end with this exact four-line status block. Do not replace it with prose, bullets, or a different checkpoint label.
+
+```text
+本阶段已完成：...
+CHECKPOINT · 当前需要你确认/提供：...
+确认后我将进入：...
+暂不执行的内容：...
+```
+
+Rules for the status block:
+- Always include all four lines, even when no file was created.
+- If there is not enough room or the situation is simple, output only the four-line status block. Never omit it.
+- `CHECKPOINT · 当前需要你确认/提供：...` must name the exact missing input, file, path, or decision blocking the next phase.
+- `暂不执行的内容：...` must explicitly name downstream work that is blocked, such as `逐镜视频Prompt表`, `视频生成`, `最终确认PDF`, or `资产Prompt`.
+- If the user asks to skip ahead, the response must still end with the four-line status block and must mark the skipped work under `暂不执行的内容`.
+- Do not output any alternative ending such as `下一步建议`, `关键 checkpoint`, `请把...发我`, or `我会...` unless the four-line status block is still present after it.
+- Do not end with labels such as `阶段`, `输入`, `产物`, `检查点`, `下一步`, or `逐镜Prompt表`; convert them into the four required lines.
+- Before sending, run this self-check: if the final four non-empty lines do not start with exactly `本阶段已完成：`, `CHECKPOINT · 当前需要你确认/提供：`, `确认后我将进入：`, and `暂不执行的内容：`, rewrite the ending.
+- Any response ending with `阶段：`, `输入：`, `产物：`, `检查点：`, `状态：`, `下一步：`, `归档：`, or `文件：` is invalid.
+- Do not say `可以进入逐镜视频 Prompt 表` or `确认后生成逐镜视频Prompt表` unless `04_最终确认归档/` already contains the final confirmation PDF/HTML archive. If that archive is not present, say the final confirmation archive is the next gate.
+
+Minimal valid response examples:
+
+Project start:
+```text
+本阶段已完成：识别为 Phase 1 · 原始脚本接收，当前不进入资产Prompt、逐镜Prompt或视频生成
+CHECKPOINT · 当前需要你确认/提供：客户脚本文件/原文、产品图路径、交付比例/时长/平台、不可改内容和官方素材清单
+确认后我将进入：创建项目文件夹、生成 02_用户确认文件/项目名_脚本与资产确认表_v01.xlsx，并做脚本审核
+暂不执行的内容：资产Prompt、逐镜视频Prompt表、视频生成、最终确认PDF
+```
+
+Skip-ahead request before final confirmation archive:
+```text
+本阶段已完成：确认人物和场景图已通过，但尚未看到 04_最终确认归档/ 下的最终确认PDF归档
+CHECKPOINT · 当前需要你确认/提供：最终确认PDF/HTML归档路径，或确认是否先生成 04_最终确认归档/项目名_脚本与设定资产最终确认归档_vNN.pdf
+确认后我将进入：基于最终确认归档生成 05_内部制作执行/内部执行脚本与Prompt表_vNN.xlsx
+暂不执行的内容：逐镜视频Prompt表、视频生成
+```
+
+## Path Contract
+
+When naming folders, affected files, or next files, use only paths from this fixed whitelist unless the user explicitly gives an existing project path or asks for a new exact folder name:
+
+```text
+00_项目说明_文件夹与命名规则.md
+01_客户原始资料/01_脚本/
+01_客户原始资料/02_产品素材/
+01_客户原始资料/03_用户反馈参考图/
+02_用户确认文件/
+02_用户确认文件/项目名_脚本与资产确认表_vNN.xlsx
+02_用户确认文件/用户修改意见记录_vNN.xlsx
+03_设定资产/01_人物设定图/
+03_设定资产/02_场景设定图/
+03_设定资产/03_产品参考图/
+03_设定资产/04_道具设定图/
+03_设定资产/05_特效关键帧/
+04_最终确认归档/
+05_内部制作执行/
+05_内部制作执行/设定资产制作表_vNN.xlsx
+05_内部制作执行/内部执行脚本与Prompt表_vNN.xlsx
+05_内部制作执行/01_首帧与关键帧/
+05_内部制作执行/02_视频片段/
+05_内部制作执行/03_成片/
+05_内部制作执行/04_封面/
+```
+
+Forbidden invented paths include:
+- `01_脚本分镜/`
+- `03_角色设定/`
+- `04_画面提示词/`
+- `05_生成素材/`
+- `06_视频工程/`
+- `客户反馈/`
+- `视频Prompt/`
+- `提示词参考/`
+
+If a model wants to say "downstream files are affected", it must map the impact to the whitelist. Examples:
+- script, shot, or product-entry logic changes -> `02_用户确认文件/项目名_脚本与资产确认表_vNN.xlsx`
+- client feedback records -> `02_用户确认文件/用户修改意见记录_vNN.xlsx`
+- character costume or face changes -> `03_设定资产/01_人物设定图/` and, if prompts already exist, `05_内部制作执行/设定资产制作表_vNN.xlsx`
+- scene reference changes -> `03_设定资产/02_场景设定图/`
+- product appearance or official asset changes -> `01_客户原始资料/02_产品素材/` and `03_设定资产/03_产品参考图/`
+- prop changes -> `03_设定资产/04_道具设定图/`
+- effect/keyframe changes -> `03_设定资产/05_特效关键帧/` and `05_内部制作执行/01_首帧与关键帧/`
+- per-shot video prompt changes -> `05_内部制作执行/内部执行脚本与Prompt表_vNN.xlsx`
+- generated clips -> `05_内部制作执行/02_视频片段/`
+- finished cuts -> `05_内部制作执行/03_成片/`
+
+## Project Folder Contract
+
+For AI short-drama / AI short-video delivery projects, use the established project folder format from:
+`/Users/jude/Desktop/卡萨帝空调红楼梦AI短剧_项目交付文件夹`
+
+Do not invent a new directory layout per project. When scaffolding a project, create only the fixed standard directories below. Do not create broad "maybe useful" extra folders outside this contract.
+
+Default fixed structure:
+
+```text
+项目名_项目交付文件夹/
+  00_项目说明_文件夹与命名规则.md
+  01_客户原始资料/
+    01_脚本/
+    02_产品素材/
+    03_用户反馈参考图/
+  02_用户确认文件/
+  03_设定资产/
+    01_人物设定图/
+    02_场景设定图/
+    03_产品参考图/
+    04_道具设定图/
+    05_特效关键帧/
+  04_最终确认归档/
+  05_内部制作执行/
+    01_首帧与关键帧/
+    02_视频片段/
+    03_成片/
+    04_封面/
+```
+
+Directory meaning:
+- `01_客户原始资料/01_脚本`: client-provided original script files.
+- `01_客户原始资料/02_产品素材`: client-provided product images, logo, brand assets, packaging/KV, font authorization, or official product references.
+- `01_客户原始资料/03_用户反馈参考图`: user/client feedback reference images.
+- `02_用户确认文件`: client-facing Excel confirmation workbooks and client-returned confirmation files.
+- `03_设定资产/01_人物设定图`: character headshots, full-body images, group references.
+- `03_设定资产/02_场景设定图`: scene reference images.
+- `03_设定资产/03_产品参考图`: production-ready product reference images derived from or selected from official material.
+- `03_设定资产/04_道具设定图`: props.
+- `03_设定资产/05_特效关键帧`: effect reference frames.
+- `04_最终确认归档`: final client-facing confirmation PDFs and their HTML sources.
+- `05_内部制作执行`: internal execution workbooks and production outputs. Prompt workbooks live directly here, not inside a separate Prompt directory.
+- `05_内部制作执行/01_首帧与关键帧`: first frames, middle keyframes, end frames, and QC-approved frame references.
+- `05_内部制作执行/02_视频片段`: per-shot generated clips such as `镜头01_视频_v01.mp4`.
+- `05_内部制作执行/03_成片`: finished or submitted full cuts such as `6月6日.mp4` or `项目名_成片_v01.mp4`.
+- `05_内部制作执行/04_封面`: covers, title cards, thumbnails, and publishing cover images.
+
+Hard folder rules:
+- Do not create `03_执行版脚本`, `提示词参考`, `视频Prompt`, `粗剪样片`, `最终交付包`, `剪辑工程与导出配置`, or similar extra folders unless the user explicitly asks for that exact directory.
+- Do not create a standalone `06_最终交付包` by default. Confirmed deliverables stay in `05_内部制作执行/03_成片` and `05_内部制作执行/04_封面` unless the user explicitly asks for a separate delivery package.
+- If an existing project uses older or extra folders, do not delete them without explicit user confirmation. Instead, report which folders diverge from this standard and ask before cleanup.
+- When creating or updating `00_项目说明_文件夹与命名规则.md`, include the fixed structure above and the rule that extra directories are not created unless explicitly requested.
+
+## Phase Order Contract
+
+Once this skill is activated for a project, preserve the current project phase and do not skip downstream checkpoints. If the user says `继续`, `下一步`, `上`, or gives a short continuation command, infer the next phase from existing project files and the mandatory order below.
+
+Mandatory order:
+1. Read the source script and create or update the script audit / client confirmation workbook.
+2. Get or record the user's/client's decision on script handling, picture ratio, and asset direction.
+3. Create the internal asset production workbook in `05_内部制作执行/`.
+4. Call `镜头设计师` / `shot-designer` for asset prompts.
+5. Wait for the user/producer to generate or provide finished asset images under `03_设定资产/`.
+6. Backfill finished asset filenames/paths into the client confirmation workbook.
+7. Call `土金PDF` / `tujinpdf` to generate the client-facing final confirmation archive. Keep both the styled HTML source and same-version PDF under `04_最终确认归档/`.
+8. Only after the final confirmation archive exists, call `镜头设计师` / `shot-designer` for the internal per-shot execution and video prompt workbook.
+
+Hard rules:
+- Do not enter per-shot video prompt production before the final confirmation PDF archive exists.
+- Do not create final confirmation PDFs with ReportLab, direct PDF drawing, or ad hoc PDF scripts when `土金PDF` is available.
+- Do not expose internal Prompt content in client-facing workbooks or PDFs.
+- Do not put internal execution next steps such as `进入内部执行脚本与Prompt表` in client-facing confirmation documents.
+- Do not treat preview or generated assets as confirmed until their filenames/paths have been backfilled into the client confirmation workbook or final confirmation archive.
+- If current files show a later phase was started out of order, stop that branch, restore the phase order, and tell the user which artifact must be produced first.
+
+## Project Pilot Mode
+
+When the user activates this skill for a project, act as the project pilot, not only as a file generator. The user should not have to guess what the next step is.
+
+At the start of a project or when resuming:
+1. Identify the current phase from the user's request and existing project files when available.
+2. State the exact input needed from the user.
+3. State what will be produced after that input.
+4. State the `CHECKPOINT` before the next phase.
+5. Do not proceed silently across checkpoints.
+
+At the end of every phase, use the exact four-line status block from `Response Contract`.
+
+If the user provides the requested input, process it and then ask for the next confirmation using concrete choices when possible.
+
+If the user says `继续`, `下一步`, `上`, `韦斯安德森项目领航继续`, or equivalent:
+- inspect existing project files if available;
+- infer the current phase;
+- tell the user the next required input or confirmation;
+- do not generate downstream artifacts until the required confirmation exists.
+
+Use this phase guide:
+
+Phase 1 · 原始脚本接收
+- Need from user: script file or pasted script.
+- Output: project folder plus script/client confirmation workbook.
+- Ask user to confirm: script handling permission, picture ratio, non-negotiable items, and missing official assets.
+- Required ending: use the `Project start` minimal valid response example from `Response Contract`.
+
+Phase 2 · 脚本与资产方向确认
+- Need from user: whether the script is approved/default-approved, target ratio, and whether professional micro-adjustment is allowed.
+- Output: updated confirmation workbook.
+- Ask user to confirm: whether to create the internal asset production workbook.
+
+Phase 3 · 设定资产制作表
+- Need from user: confirmed script and asset direction.
+- Output: internal asset production workbook.
+- Ask user to confirm: generate or write asset prompts.
+
+Phase 4 · 资产 Prompt
+- Need from user: target style/reference if any; otherwise use the project style.
+- Output: asset prompt workbook.
+- Ask user to provide or generate asset images under `03_设定资产/`.
+
+Phase 5 · 资产回填
+- Need from user: finished asset images.
+- Output: updated client confirmation workbook with actual filenames/paths.
+- Ask user to confirm: assets are accepted for the final confirmation archive.
+
+Phase 6 · 最终确认 PDF
+- Need from user: confirmed script and finished assets.
+- Output: `土金PDF` styled HTML plus same-version PDF archive.
+- Ask user to confirm: whether to enter internal per-shot prompt production.
+- Required ending when final confirmation archive is missing: use the `Skip-ahead request before final confirmation archive` minimal valid response example from `Response Contract`.
+
+Phase 7 · 内部逐镜 Prompt
+- Need from user: approved confirmation workbook, confirmed assets, and target tool if any.
+- Output: internal execution script and prompt workbook.
+- Ask user to confirm or generate: first frames, end frames, keyframes, and video clips.
+- Required ending: always name `05_内部制作执行/内部执行脚本与Prompt表_vNN.xlsx` in `确认后我将进入` and list blocked video generation under `暂不执行的内容` unless the user has approved prompt generation and visual QC.
 
 ## Related Skills
 
@@ -75,6 +364,8 @@ Stop and ask for confirmation at these points:
 
 If a checkpoint is missing, create or update only the relevant workbook and clearly state which confirmation is blocking the next phase. The internal asset production branch may create prompts for the producer before client approval, but it is not user-facing and must not be treated as final approval.
 
+Before closing any phase, read `references/delivery_checklist.md` and apply the P0/P1 checks that match the current phase. A P0 issue blocks downstream work even if the user says `继续`.
+
 ## Core Workflow
 
 ### 1. Script Audit
@@ -103,6 +394,15 @@ This must appear before prompt generation, because framing, character blocking, 
 字幕安全区, and final exports all depend on it.
 
 For detailed audit rules, read `references/audit_checklist.md`.
+
+At the start of the audit, classify the project type and add the corresponding confirmation emphasis:
+- product ads need official product material, Logo, screen text, feature claims, and product exposure rules
+- AI short dramas need story logic, character/scene continuity, dialogue length, asset direction, and shot feasibility
+- brand films need brand voice, visual tone, forbidden expressions, music/voice authorization, and delivery ratio
+- knowledge/talking-head videos need factual basis, citation needs, subtitle strategy, pacing, and information hierarchy
+- ecommerce videos need platform ratio, product handling, offer text, product close-ups, and subtitle-safe areas
+
+Do not create a new folder or a separate workflow for these types. Use the fixed workbook and path contracts.
 
 Client-facing workbooks must use polite human-review language. Do not mention internal automation, rule scanning, machine judgment, or "自动审核". Use wording such as `经逐镜审核`, `建议`, `暂未发现明显执行风险`, and `如贵方有补充要求`.
 
@@ -143,7 +443,9 @@ After completing this branch, tell the user:
 
 ### 2. Client Confirmation Workbook As Source Of Truth
 
-Do not create a separate `执行版脚本.xlsx` by default. If it is not directly shown to the client, it adds an extra file with little value. Keep the confirmed script changes, visual direction, asset image references, and user modification records inside `项目名_脚本与资产确认表_v01.xlsx`.
+Do not create a separate `执行版脚本.xlsx` by default. If it is not directly shown to the client, it adds an extra file with little value. Keep the confirmed script changes, visual direction, and asset image references inside `项目名_脚本与资产确认表_v01.xlsx`.
+
+Do not add `项目接收与处理记录`, `项目接收记录`, or `用户修改意见记录` sheets to the main client confirmation workbook. The main workbook should stay focused on script, visual direction, asset confirmation, and client choices.
 
 If a script structure layer is needed for internal prompt writing, keep it as:
 - a sheet inside the main client confirmation workbook, or
@@ -172,7 +474,7 @@ When the client has many revisions, create a user-facing workbook or sheet named
 
 Keep the tone factual and service-oriented. Do not complain or accuse the client. The purpose is to let both sides review what was requested, what was confirmed, and what was delivered.
 
-When the user submits client modification feedback during any phase, record it immediately before continuing downstream work. Prefer a worksheet named `用户修改意见记录` in the current confirmation workbook, or a separate workbook named `用户修改意见记录_vNN.xlsx` under `02_用户确认文件/` when the feedback spans multiple files.
+When the user submits client modification feedback during any phase, record it immediately before continuing downstream work. Always use a separate workbook named `用户修改意见记录_vNN.xlsx` under `02_用户确认文件/`. Do not put this record as a worksheet inside `项目名_脚本与资产确认表_vNN.xlsx`.
 
 Use this submission template when asking the user to provide or normalize client feedback:
 
@@ -202,20 +504,17 @@ Use this submission template when asking the user to provide or normalize client
 我的处理建议/备注：
 ```
 
-After recording feedback, tell the user which downstream files are affected and the next action. Example:
-`已记录本轮修改意见，影响镜头03-05和角色服装设定，预计需重新制作8秒；下一步我会更新项目名_脚本与资产确认表_v01.xlsx和内部设定资产制作表，暂不生成新图，等你确认。`
+After recording feedback, tell the user which whitelist paths are affected and the next action. Do not name invented folders. Example:
+`已记录本轮修改意见到 02_用户确认文件/用户修改意见记录_vNN.xlsx；本轮影响 02_用户确认文件/项目名_脚本与资产确认表_vNN.xlsx、03_设定资产/01_人物设定图/、05_内部制作执行/设定资产制作表_vNN.xlsx；暂不生成新图，等你确认。`
+
+For common client feedback:
+- `第3镜人物衣服要换` affects `02_用户确认文件/用户修改意见记录_vNN.xlsx`, `02_用户确认文件/项目名_脚本与资产确认表_vNN.xlsx`, `03_设定资产/01_人物设定图/`, and any existing `05_内部制作执行/设定资产制作表_vNN.xlsx`.
+- `第8镜产品出现太突兀` affects `02_用户确认文件/用户修改意见记录_vNN.xlsx`, `02_用户确认文件/项目名_脚本与资产确认表_vNN.xlsx`, `01_客户原始资料/02_产品素材/`, `03_设定资产/03_产品参考图/`, and any existing `05_内部制作执行/内部执行脚本与Prompt表_vNN.xlsx`.
+- New client reference images belong in `01_客户原始资料/03_用户反馈参考图/`, then their filenames/paths should be referenced from `02_用户确认文件/用户修改意见记录_vNN.xlsx`.
 
 Do not merge multiple feedback rounds into one vague note. Keep each round as a separate row with timestamp, source, affected shots/assets, original client wording, required action, status, and next file to update.
 
-At the start of each new project, create or update a simple project receipt/execution record. At minimum, record:
-- `资料接收时间`
-- `资料名称`
-- `资料类型`
-- `来源路径/来源说明`
-- `处理动作`
-- `当前状态`
-
-The final user-facing archive should reuse this record so the client can see when the original script was received and what was done at each stage. Use neutral names such as `项目执行过程与修改确认归档` or `项目执行总结归档`; avoid naming user-facing files with `工作量说明`.
+Do not create a project receipt or processing-record sheet by default. If the user explicitly asks for a project timeline, closeout archive, or execution summary, derive the needed dates and source names from the available files and user-provided context at that later phase. Use neutral names such as `项目执行过程与修改确认归档` or `项目执行总结归档`; avoid naming user-facing files with `工作量说明`.
 
 For `项目执行过程与修改确认归档`, include a full script comparison sheet when possible. The sheet should list every original shot from the client script in order, not only changed items. For each shot, keep the original script fields, then add user revision instruction, user-confirmed/post-revision execution result, adjustment impact, status, and notes. Unchanged shots should explicitly say no added revision and that the original/confirmed execution is retained.
 
@@ -341,6 +640,8 @@ Before delivering a client-facing PDF:
 
 Prompt generation is owned by the `镜头设计师` skill. Do not duplicate detailed prompt-writing rules inside this skill.
 
+The project lead may pass project type, confirmed style, target platform, ratio, and asset status to `镜头设计师`, but must not alter the `视频内容Prompt（含声音/负面）` top-level structure. If a new shot taxonomy or validation rule is needed, update `镜头设计师` documentation/scripts with explicit approval instead of adding ad hoc prompt fields here.
+
 When the project reaches asset prompt writing or per-shot video prompt writing, call `镜头设计师` with:
 - approved `项目名_脚本与资产确认表_v01.xlsx`
 - project directory
@@ -358,7 +659,7 @@ Expected handoff outputs from `镜头设计师`:
 - keyframe skip/reuse decisions
 - validation result from `validate_prompt_detail.py`
 
-Boundary rules kept by 韦斯安德森:
+Boundary rules kept by 韦斯安德森项目领航:
 - client-facing workbooks must not expose internal prompt engineering
 - the main client confirmation workbook remains the source of truth for approved script and assets
 - if `镜头设计师` reports missing confirmations, update the client confirmation workbook before continuing
@@ -370,7 +671,7 @@ After `镜头设计师` finishes, report:
 
 ## Project Folder Standard
 
-Do not make the folder template too rigid. First read and understand the script, extract likely asset categories, then create project-specific asset subfolders.
+Use the fixed project folder contract. Do not create project-specific folder layouts unless the user explicitly asks for exact additional directories.
 
 Keep first-level folders stable:
 
@@ -380,11 +681,14 @@ Keep first-level folders stable:
   01_客户原始资料/
     01_脚本/
     02_产品素材/
-    03_用户反馈参考图/        # only when feedback/reference images exist
-    04_品牌素材/              # only when provided
-    05_字体授权/              # only when provided
+    03_用户反馈参考图/
   02_用户确认文件/
   03_设定资产/
+    01_人物设定图/
+    02_场景设定图/
+    03_产品参考图/
+    04_道具设定图/
+    05_特效关键帧/
   04_最终确认归档/
   05_内部制作执行/
     01_首帧与关键帧/
@@ -395,46 +699,20 @@ Keep first-level folders stable:
 
 Do not create a separate first-level `03_执行版脚本/` directory. If a confirmed text execution script is needed, keep it in `02_用户确认文件/` when it is user-facing, or keep the execution layer inside the internal workbook in `05_内部制作执行/`.
 
-Do not create empty placeholder folders. Create optional folders such as `03_用户反馈参考图/`, `04_品牌素材/`, `05_字体授权/`, or `05_内部制作执行/04_封面/` only when the project actually has those materials or deliverables.
+Do not create extra placeholder folders outside the fixed structure. If brand assets or font authorization files exist, store them under `01_客户原始资料/02_产品素材/` unless the user explicitly asks for separate folders.
 
 Do not create a generic `提示词参考` folder in the project structure. If a user provides a prompt reference file, use it to update the skill or prompt standard when appropriate, then archive the source only if the user explicitly wants to keep it.
 
-Create subfolders under `03_设定资产/` according to the actual script. Do not hardcode project-specific names such as `产品与法器设定` in the generic template. Product source materials belong under `01_客户原始资料/02_产品素材`; generated product-effect keyframes can go under a project-specific asset folder only when needed.
+Do not hardcode project-specific names such as `产品与法器设定` in the generic template. Product source materials belong under `01_客户原始资料/02_产品素材`; production-ready product references belong under `03_设定资产/03_产品参考图`.
 
-Examples:
-
-```text
-西游/神话项目:
-  03_设定资产/
-    01_人物设定图/
-    02_场景设定图/
-    03_道具设定图/
-    04_特效关键帧/
-
-汽车广告:
-  03_设定资产/
-    01_车型外观参考/
-    02_场景设定图/
-    03_驾驶员形象/
-    04_动态特效关键帧/
-
-美妆广告:
-  03_设定资产/
-    01_人物模特设定/
-    02_产品质感参考/
-    03_场景氛围图/
-    04_质地特效关键帧/
-```
-
-Use `scripts/create_project.py` to scaffold the stable structure and create the initial confirmation workbook. If asset categories are already known, pass them with `--asset-subfolders`.
+Use `scripts/create_project.py` to scaffold the stable structure and create the initial confirmation workbook. Only pass `--asset-subfolders` when the user explicitly asks for extra asset folders beyond the standard contract.
 
 Example:
 
 ```bash
 python /Users/jude/.codex/skills/wes-anderson/scripts/create_project.py \
   --project-name "海尔空调西游记AI短剧" \
-  --base-dir "$HOME/Desktop" \
-  --asset-subfolders "人物设定图,场景设定图,道具设定图,特效关键帧"
+  --base-dir "$HOME/Desktop"
 ```
 
 ## Automation Scripts
@@ -446,11 +724,10 @@ Use these scripts when possible instead of rebuilding the same Excel structure b
 ```bash
 python /Users/jude/.codex/skills/wes-anderson/scripts/create_project.py \
   --project-name "项目名" \
-  --base-dir "$HOME/Desktop" \
-  --asset-subfolders "人物设定图,场景设定图,道具设定图,特效关键帧"
+  --base-dir "$HOME/Desktop"
 ```
 
-Creates the project folder structure and an initial `项目名_脚本与资产确认表_v01.xlsx`. Omit `--asset-subfolders` when the script has not been reviewed yet; add or create asset subfolders after asset extraction. Do not generate a separate naming-example document; naming rules live in `00_项目说明_文件夹与命名规则.md`.
+Creates the fixed project folder structure, an initial `项目名_脚本与资产确认表_v01.xlsx`, and a separate `用户修改意见记录_v01.xlsx`. Do not generate a separate naming-example document; naming rules live in `00_项目说明_文件夹与命名规则.md`.
 
 ### Audit Script Workbook
 
@@ -498,6 +775,16 @@ python /Users/jude/.codex/skills/wes-anderson/scripts/build_client_confirmation_
 
 Creates a client-facing PDF and a sibling `.manifest.txt` file. The generator validates the
 manifest before rendering. Run `scripts/validate_client_facing_text.py` again before delivery.
+
+### Delivery Checklist
+
+Before reporting a phase as complete, check:
+
+```bash
+sed -n '1,220p' /Users/jude/.codex/skills/wes-anderson/references/delivery_checklist.md
+```
+
+Apply the matching P0/P1 items. Do not claim completion when the current phase output is missing, has the wrong version, is in the wrong folder, or exposes internal production language to the client.
 
 ## Failure Modes And Recovery
 
@@ -550,12 +837,14 @@ Reserve stronger internal language for internal notes only:
 Do not do these:
 
 - Do not skip client confirmation checkpoints to produce downstream files faster.
+- Do not end active project-pilot responses with `阶段/输入/产物/检查点` or `状态/下一步/归档/文件`; use the exact four-line `Response Contract` block.
 - Do not treat preview character, scene, product, prop, or effect images as approved production assets before they are referenced back in the client confirmation workbook and confirmed.
 - Do not ask the client to confirm storyboards unless explicitly required.
 - Do not use AI-generated product appearance as final brand reference; official product assets override prompts.
 - Do not put internal image/video prompts in client-facing sheets; prompts belong in `设定资产制作表` or `内部执行脚本与Prompt表`.
 - Do not create a separate `02_视频Prompt` folder; the prompt workbook belongs directly under `05_内部制作执行/`.
 - Do not create a separate top-level `03_执行版脚本/` folder or standalone `执行版脚本.xlsx` unless explicitly requested.
+- Do not invent downstream folders such as `01_脚本分镜`, `03_角色设定`, `04_画面提示词`, `05_生成素材`, `06_视频工程`, or `客户反馈`; map every affected item to the `Path Contract` whitelist.
 - Do not move `03_设定资产` under `05_内部制作执行`; use a lightweight reference entry when execution needs access.
 - Do not create nested current-version folders such as `第一版启用` for active assets; keep current assets flat and move old versions to `90_历史版本/`.
 - Do not mix internal costing, settlement, workload, or billing wording into user-facing archives.

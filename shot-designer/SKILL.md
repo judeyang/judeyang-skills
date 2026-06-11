@@ -1,9 +1,11 @@
 ---
 name: 镜头设计师
-description: Use when the user needs AI video shot design and production prompts: asset image prompts, per-shot first-frame/end-frame/keyframe planning, video generation prompts, Seedance/LibTV prompt workbooks, continuity locking, camera/action/sound design, prompt QA, and keyframe necessity review. Triggers on 镜头设计、分镜Prompt、视频Prompt、首帧Prompt、结尾帧Prompt、中间关键帧、关键帧规划、运镜、Seedance、LibTV、逐镜执行表、设定资产制作表.
+description: Use when the user needs AI video shot design and production prompts: asset image prompts, per-shot first-frame/end-frame/keyframe planning, video generation prompts, Seedance/LibTV prompt workbooks, continuity locking, camera/action/sound design, prompt QA, and keyframe necessity review. Triggers on 镜头设计、镜头设计师、镜头大师、分镜大师、shot-designer、分镜Prompt、视频Prompt、视频生成Prompt、每个画面帧Prompt、画面帧Prompt、首帧Prompt、结尾帧Prompt、中间关键帧、关键帧规划、运镜、Seedance、LibTV、逐镜执行表、设定资产制作表.
 ---
 
 # 镜头设计师
+
+> Created by JudeYang.
 
 Use this skill to design production-ready image/video prompts from an approved script, client confirmation workbook, storyboard, or asset plan.
 
@@ -73,27 +75,33 @@ All per-shot final video prompts must pass this contract before delivery:
 - `【基础设定】` must include explicit `文字策略：`; non-product shots still need no-subtitle/no-watermark/no-garbled-text rules
 - every time-coded block contains all nine detail labels
 - BGM/music generation is explicitly forbidden inside `声音：`
+- source-script consistency must pass: original/confirmed dialogue, visible action, performance notes, and sound/effect notes from the execution row must not be lost when written into `视频内容Prompt（含声音/负面）`.
 
 ## Core Workflow
 
 1. Read the approved source from beginning to end.
-2. Lock continuity before writing prompts:
+2. Classify each shot with `references/shot_type_registry.md` before writing prompts. This classification is an internal production/QC aid only; do not add new top-level headings or extra fields to the model-facing `视频内容Prompt（含声音/负面）`.
+3. Lock continuity before writing prompts:
    - scene geography and camera axis
    - character positions, eyelines, seating/blocking, left/right relationships
    - product position/state and official-material constraints
    - prop/effect state changes
    - shot-to-shot handoff
-3. Decide reference roles for each shot:
+4. Decide reference roles for each shot:
    - character identity
    - costume/body silhouette
    - background/scene lock
    - product appearance
    - prop/effect appearance
    - first/end/keyframe state
-4. Write the video prompt first.
-5. Decide the keyframe plan from the video prompt.
-6. Write only the needed frame prompts.
-7. Validate and fix before delivery.
+5. Write the video prompt first.
+6. Compare each video prompt against the original execution row before writing frame prompts:
+   - exact dialogue/voiceover text from `台词/旁白` must appear in the model-facing `视频内容Prompt（含声音/负面）`, not only as `同期台词` or a summary
+   - important visible actions, expressions, props, locations, and transitions from `原始脚本内容` / `确认后执行内容` must be present or explicitly redirected to post-production
+   - sound and effect notes from `音效/音乐` must be present as generated sound, synchronous sound, or post-production guidance; do not silently drop them
+7. Decide the keyframe plan from the video prompt and the shot type registry.
+8. Write only the needed frame prompts.
+9. Validate source consistency and prompt structure, then fix before delivery.
 
 ## Checkpoints
 
@@ -102,7 +110,8 @@ Use these explicit checkpoints to avoid generating the wrong production layer:
 - `CHECKPOINT 1 · Source lock`: before writing any prompt, confirm the script or workbook is the approved source. If the source is draft, missing, or contradicted by newer user feedback, stop prompt writing and ask for the latest source.
 - `CHECKPOINT 2 · Asset lock`: before writing video prompts that bind references, confirm which character, scene, product, prop, first-frame, and end-frame assets actually exist. If a reference is only described in text and not available as a file, mark it `待提供` or `待生成`; do not write it as uploaded.
 - `CHECKPOINT 3 · Keyframe decision`: after the video prompt is drafted and before frame prompts are written, decide which of `首帧 / 中间关键帧 / 结尾帧` are needed. Skip blank or unnecessary keyframe cells.
-- `CHECKPOINT 4 · Pre-generation QC`: before connecting assets to Seedance, LibTV, or another video node, validate the workbook and visually inspect generated frames. Failed frames must be regenerated or marked unusable before video generation.
+- `CHECKPOINT 4 · Source consistency QC`: before delivering the internal prompt workbook or syncing prompts to Seedance/LibTV, run the validation script against the workbook and fix every missing dialogue, visual action, performance cue, transition, or sound/effect item.
+- `CHECKPOINT 5 · Pre-generation QC`: before connecting assets to Seedance, LibTV, or another video node, validate the workbook and visually inspect generated frames. Failed frames must be regenerated or marked unusable before video generation.
 
 ## Failure Handling
 
@@ -112,6 +121,9 @@ Use these explicit checkpoints to avoid generating the wrong production layer:
 | Asset reference is named but file is missing | Mark `待提供` or `待生成`; do not claim it is uploaded or bound. |
 | Product official asset is missing | Do not invent product shape, logo, screen text, outlet, or material; request official material. |
 | Prompt contains BGM/music generation wording | Remove it from the model-facing video prompt; keep only `不需要配乐，不生成BGM，音乐后期单独配。` |
+| Dialogue exists in `台词/旁白` but only appears as `同期台词` or a summary in `视频内容Prompt` | Insert the exact dialogue into both `声音：` and the relevant `画面内容：` beat so lip-sync, performance, and timing are preserved. |
+| Original or confirmed picture content is summarized too aggressively | Restore the missing visible action, location, prop, expression, transition, and end-state details in the relevant time-coded beat. |
+| Original sound/effect notes are missing | Add them to `声音：` as generated synchronous sound/effect or post-production guidance. |
 | Text strategy conflicts with product/story text | Default to no subtitles/watermarks/garbled text; allow only confirmed product text or story-critical prop text. |
 | `景别/机位/构图/运镜手法` are mixed | Rewrite the time block before delivery; do not leave mixed fields for production. |
 | Negative list is broad or copied across shots | Prune to the current shot's 3-6 relevant quality boundaries, maximum 8. |
@@ -152,6 +164,8 @@ Each `视频内容Prompt（含声音/负面）` must include:
 - `【氛围与画质】`
 - `【画面内容】`
 
+Do not change this top-level structure when adding shot-type discipline. Shot type, medium constraints, keyframe decisions, and production notes belong in `生成前执行说明`, workbook metadata, or internal QC notes. The model-facing video prompt should remain compact and directly useful to the video model.
+
 Do not use the old long heading stack as the default video prompt:
 - no standalone `核心主题：`
 - no standalone `【运镜规则】`
@@ -191,6 +205,13 @@ Every time-coded beat must state:
 - `结束状态`
 - `衔接要求`
 
+`衔接要求` is a legacy field name. In model-facing prompts, treat it as `结束边界`, not as an instruction to connect to the next shot.
+
+For independently generated clips, `衔接要求` must not describe the next shot's picture, character, action, dialogue, camera movement, or transition target. The video model cannot see the next node and may generate that future action inside the current clip. Write only a short self-contained boundary, preferably one fixed sentence:
+`衔接要求：本镜头停在上述结束状态；不生成下一镜、其他角色新动作或额外剧情。`
+
+If an editing transition is needed, put it in `生成前执行说明` or post-production notes, not inside the model-facing `视频内容Prompt（含声音/负面）`.
+
 Field discipline:
 - `景别` only describes shot size, such as `大全景`、`全景`、`中景`、`中近景`、`近景`、`特写`; do not write `电影感` or `史诗感` there.
 - `机位` describes camera position/angle/height, such as `无人机高空俯拍`、`低机位仰拍`、`平视正面30度`.
@@ -198,6 +219,8 @@ Field discipline:
 - `运镜手法` describes camera movement and rhythm, such as fixed shot, push-in, follow shot, pan, tilt, orbit, handheld, drone follow, and cut rules.
 
 Avoid placeholders such as `按本镜头需要选择`, `根据主体动作采用`, `按画面执行`, `保持可识别`, `适当`, or `根据实际情况`. Replace them with concrete subject, body part, prop, product state, effect path, composition, and camera path.
+
+Avoid AI-slop style fillers unless they are anchored to concrete visible choices. Words such as `电影感`, `高级感`, `震撼`, `精致`, `氛围感`, `大片感`, and `质感` do not control generation by themselves. If used, tie them to lens, lighting, color, material, camera movement, blocking, or texture.
 
 Do not ask the video tool to generate music, BGM, underscore, score, or background music. Always keep music as post-production guidance outside generation. In the model-facing video prompt, explicitly write `不需要配乐，不生成BGM，音乐后期单独配。`
 
@@ -228,6 +251,11 @@ Generate middle keyframes only for material differences:
 
 Pure black, pure white, solid-color, fade-only, and no-subject transition frames are not AI keyframes. Keep those as video or post-production instructions.
 
+Use `references/shot_type_registry.md` as the keyframe planning guardrail:
+- product, function, special-effect, large action, and ending-state shots more often need `首帧 + 结尾帧`
+- dialogue, small expression, and atmosphere shots usually need only `首帧`
+- middle keyframes remain exceptional, even when a shot has multiple beats
+
 ## Keyframe Reuse
 
 If one continuous action is split into two rows and the previous shot's final visible state exactly equals the next shot's starting state, generate the image once.
@@ -248,6 +276,12 @@ Before connecting any keyframe to Seedance, LibTV, or another video node:
 - check start/middle/end action state
 - check spatial continuity and camera axis
 - check no captions, labels, UI, watermark, garbled text, or unintended logo
+
+Medium constraints must be checked before generation:
+- Seedance/LibTV reference roles are explicit and refer only to files that exist or are marked `待生成`
+- vertical short-drama shots preserve face, hands, and product-safe areas
+- product/commercial shots prioritize official material, logo spelling, product geometry, and screen text over decorative effects
+- story shots preserve actor continuity, eyeline, and camera-axis continuity over generic visual flourish
 
 If a reference image was only mentioned in text and not actually uploaded/bound, say so. Claim visual-reference use only for files that are actually uploaded or selected.
 
@@ -304,7 +338,9 @@ python /Users/jude/.codex/skills/shot-designer/scripts/validate_prompt_detail.py
   --input "/path/to/内部执行脚本与Prompt表_v01.xlsx"
 ```
 
-Run validation before delivery. Treat missing three-part prompt sections, missing `风格核心/视觉基调/色彩与影调`, placeholder filler, keyframe mismatch, full local paths, missing text strategy, and music-generation wording as blocking issues.
+Run validation before delivery. Treat missing three-part prompt sections, missing `风格核心/视觉基调/色彩与影调`, placeholder filler, keyframe mismatch, full local paths, missing text strategy, music-generation wording, missing exact dialogue, and missing original script action/sound details as blocking issues.
+
+Also read `references/shot_type_registry.md` before large prompt batches. It is a planning and QC reference, not a reason to expand the model-facing prompt schema.
 
 ## Call From 韦斯安德森
 

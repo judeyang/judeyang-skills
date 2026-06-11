@@ -400,8 +400,10 @@ def style_sheet(ws, widths: list[int], header_row: int = 1, row_height: int = 84
     ws.auto_filter.ref = ws.dimensions
 
 
-def append_feedback_template(wb: Workbook):
-    ws = wb.create_sheet("用户修改意见记录")
+def write_feedback_workbook(path: Path):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "用户修改意见记录"
     ws.append(
         [
             "反馈时间",
@@ -441,6 +443,16 @@ def append_feedback_template(wb: Workbook):
         ]
     )
     style_sheet(ws, [18, 18, 24, 20, 44, 20, 20, 24, 36, 30, 28, 18, 34, 16, 30], row_height=70)
+    wb.save(path)
+
+
+def next_feedback_path(target_dir: Path) -> Path:
+    version = 1
+    while True:
+        path = target_dir / f"用户修改意见记录_v{version:02d}.xlsx"
+        if not path.exists():
+            return path
+        version += 1
 
 
 def sort_issue_key(row: list[str]) -> tuple[int, int]:
@@ -525,9 +537,9 @@ def main():
     for row in extract_assets(shots):
         ws_assets.append(row)
     style_sheet(ws_assets, [14, 20, 44, 36, 36, 16, 34], row_height=72)
-    append_feedback_template(wb)
 
     wb.save(output_path)
+    write_feedback_workbook(next_feedback_path(output_path.parent))
     print(output_path)
 
 

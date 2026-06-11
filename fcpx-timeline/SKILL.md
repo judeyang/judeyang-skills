@@ -5,6 +5,8 @@ description: Use when the user wants to turn a local folder of Mac media files i
 
 # FCPX Timeline
 
+> Created by JudeYang.
+
 ## Purpose
 
 Create a Final Cut Pro XML timeline from one local media folder, sorted by capture time. Use the bundled script instead of hand-writing FCPXML.
@@ -12,7 +14,10 @@ Create a Final Cut Pro XML timeline from one local media folder, sorted by captu
 ## Default Workflow
 
 1. Confirm or infer the source media folder path.
-2. Generate the full timeline with still conversion:
+2. Decide the sort mode:
+   - real camera media: default chronological capture-time sort
+   - AI video project clips named like `镜头01_视频_v01.mp4`: use `--ai-shot-order`
+3. Generate the full timeline with still conversion:
 
 ```bash
 python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/to/media-folder" \
@@ -22,8 +27,17 @@ python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/
   --manifest "/path/to/output-folder/timeline_manifest.json"
 ```
 
-3. Tell the user to import `timeline.fcpxml` into Final Cut Pro.
-4. Mention that converted stills live next to the XML in `timeline_stills/`; the folder must stay available for FCP relinking/import.
+For AI video clips:
+
+```bash
+python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/to/05_内部制作执行/02_视频片段" \
+  --out "/path/to/05_内部制作执行/03_成片/timeline.fcpxml" \
+  --ai-shot-order \
+  --manifest "/path/to/05_内部制作执行/03_成片/timeline_manifest.json"
+```
+
+4. Tell the user to import `timeline.fcpxml` into Final Cut Pro.
+5. Mention that converted stills live next to the XML in `timeline_stills/`; the folder must stay available for FCP relinking/import.
 
 ## Rules Encoded In The Script
 
@@ -34,6 +48,10 @@ python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/
 - Capture time priority: embedded EXIF/QuickTime/XMP metadata first; file creation/modification time as fallback.
 - Static images are copied or converted to JPEG under `timeline_stills/` when `--convert-stills` is used.
 - Clip durations and offsets are aligned to the selected timeline frame rate, default `--fps 30`, to avoid FCP frame-boundary warnings.
+- AI shot mode (`--ai-shot-order`): filenames containing `镜头NN` are sorted by shot number instead of capture time.
+- AI shot mode keeps the latest `_vNN` file per shot and prints warnings for skipped older/duplicate versions.
+- AI shot mode prints missing shot-number warnings, such as missing `镜头03` between `镜头02` and `镜头04`.
+- Unnumbered media is kept after numbered shots and reported, so B-roll or extra files do not silently disappear.
 
 ## Required Tools
 
@@ -53,6 +71,21 @@ After generation, validate the XML if Final Cut Pro is installed:
 cp "/Applications/Final Cut Pro.app/Contents/Frameworks/Interchange.framework/Versions/A/Resources/FCPXMLv1_10.dtd" /tmp/FCPXMLv1_10.dtd
 xmllint --noout --dtdvalid /tmp/FCPXMLv1_10.dtd "/path/to/output-folder/timeline.fcpxml"
 ```
+
+For AI video projects, inspect the manifest and warnings before importing:
+
+```bash
+python3 /Users/jude/.codex/skills/fcpx-timeline/scripts/make_timeline.py "/path/to/05_内部制作执行/02_视频片段" \
+  --ai-shot-order \
+  --dry-run \
+  --manifest "/path/to/timeline_manifest.json"
+```
+
+Check:
+- missing shot numbers;
+- duplicate versions and whether the selected `_vNN` is the intended latest;
+- mixed aspect ratios if the project should be strictly `9:16` or `16:9`;
+- total runtime vs the target script duration.
 
 Also check frame boundaries if the user reports warnings:
 
@@ -120,3 +153,6 @@ Use the results to isolate whether the issue is video import, still-image import
 - 不要顺手重构、格式化、改写无关文件或添加需求外功能。
 - 不要把不确定的假设写成事实。
 - 不要输出密钥、token、cookie、私有连接串或未脱敏敏感信息。
+- AI 视频项目不要默认按文件创建时间排序；优先使用 `--ai-shot-order`。
+- 不要把同一镜头的旧版和新版同时放入正式时间线；让脚本选最新版，并检查 stderr warnings。
+- 不要忽略缺号警告；缺号可能代表镜头未生成、文件命名错误或素材放错目录。

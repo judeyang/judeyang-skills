@@ -1,4 +1,4 @@
-# 韦斯安德森
+# 韦斯安德森项目领航
 
 [English](README_EN.md) | 中文
 
@@ -7,17 +7,17 @@
 ![Output](https://img.shields.io/badge/Output-Excel%20%2B%20PDF%20%2B%20Prompts-f7d98c)
 ![Status](https://img.shields.io/badge/Status-Production%20Workflow-d86f64)
 
-![韦斯安德森 banner](assets/banner.svg)
+![韦斯安德森项目领航 banner](assets/banner.svg)
 
 把 AI 短剧/短视频脚本变成可确认、可执行、可归档的制作包。
 
-韦斯安德森不是抽象影评工具，而是面向真实交付的 Agent Skill：它把客户脚本拆成脚本审核、客户确认总表、设定资产制作、Prompt 表、最终确认 PDF 和逐镜内部制作表。
+韦斯安德森项目领航不是抽象影评工具，也不是导演风格提示词工具，而是面向真实交付的 Agent Skill：它把客户脚本拆成脚本审核、客户确认总表、设定资产制作、Prompt 表、最终确认 PDF 和逐镜内部制作表。
 
 ```text
 客户脚本 → 脚本审核 → 客户确认 → 设定资产 → 逐镜Prompt → 最终归档
 ```
 
-![韦斯安德森 animated preview](assets/hero.gif)
+![韦斯安德森项目领航 animated preview](assets/hero.gif)
 
 ---
 
@@ -66,7 +66,7 @@
 
 ## 安装
 
-本 skill 已迁入统一仓库 `judeyang/judeyang-skills`。安装 `韦斯安德森` 时，请同时安装 `shot-designer`；否则进入设定资产 Prompt、首尾帧/关键帧 Prompt、逐镜视频 Prompt 阶段时会缺少依赖。
+本 skill 已迁入统一仓库 `judeyang/judeyang-skills`。安装 `韦斯安德森项目领航` 时，请同时安装 `shot-designer`；否则进入设定资产 Prompt、首尾帧/关键帧 Prompt、逐镜视频 Prompt 阶段时会缺少依赖。
 
 推荐一起安装：
 
@@ -95,11 +95,15 @@ cp -R judeyang-skills/shot-designer ~/.codex/skills/
 ## 触发示例
 
 ```text
+韦斯安德森项目领航
+韦斯安德森项目领航继续
 帮我审核这个 AI 短剧脚本
 把这个短视频脚本做成客户确认表
 生成人物设定图和场景设定图 Prompt
 根据客户确认总表生成逐镜视频 Prompt 表
 ```
+
+不要把本 skill 简写成 `韦斯安德森` 作为视觉风格提示词入口；项目领航请使用完整名称 `韦斯安德森项目领航`。
 
 ---
 

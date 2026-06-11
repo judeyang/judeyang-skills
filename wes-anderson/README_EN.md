@@ -1,4 +1,4 @@
-# Wes Anderson
+# Wes Anderson Project Pilot
 
 English | [中文](README.md)
 
@@ -7,17 +7,17 @@ English | [中文](README.md)
 ![Output](https://img.shields.io/badge/Output-Excel%20%2B%20PDF%20%2B%20Prompts-f7d98c)
 ![Status](https://img.shields.io/badge/Status-Production%20Workflow-d86f64)
 
-![Wes Anderson banner](assets/banner.svg)
+![Wes Anderson Project Pilot banner](assets/banner.svg)
 
 Turn an AI short-drama or short-video script into a confirmed, executable, and archivable production package.
 
-Wes Anderson is not an abstract script critique tool. It is a delivery-oriented Agent Skill that turns client scripts into script audits, client confirmation workbooks, asset production sheets, prompt tables, final confirmation PDFs, and internal per-shot production workbooks.
+Wes Anderson Project Pilot is not an abstract script critique tool or a director-style prompt tool. It is a delivery-oriented Agent Skill that turns client scripts into script audits, client confirmation workbooks, asset production sheets, prompt tables, final confirmation PDFs, and internal per-shot production workbooks.
 
 ```text
 Client script → Script audit → Client confirmation → Assets → Per-shot prompts → Final archive
 ```
 
-![Wes Anderson animated preview](assets/hero.gif)
+![Wes Anderson Project Pilot animated preview](assets/hero.gif)
 
 ---
 

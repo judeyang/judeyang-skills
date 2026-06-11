@@ -15,14 +15,17 @@ BASE_FOLDERS = [
     "01_客户原始资料/01_脚本",
     "01_客户原始资料/02_产品素材",
     "01_客户原始资料/03_用户反馈参考图",
-    "01_客户原始资料/04_品牌素材",
-    "01_客户原始资料/05_字体授权",
     "02_用户确认文件",
-    "03_设定资产",
+    "03_设定资产/01_人物设定图",
+    "03_设定资产/02_场景设定图",
+    "03_设定资产/03_产品参考图",
+    "03_设定资产/04_道具设定图",
+    "03_设定资产/05_特效关键帧",
     "04_最终确认归档",
     "05_内部制作执行/01_首帧与关键帧",
     "05_内部制作执行/02_视频片段",
     "05_内部制作执行/03_成片",
+    "05_内部制作执行/04_封面",
 ]
 
 
@@ -143,8 +146,16 @@ def write_confirmation_workbook(path: Path, project_name: str):
     for row in visual_rows:
         ws2.append(row)
 
-    ws3 = wb.create_sheet("用户修改意见记录")
-    ws3.append(
+    style_sheet(ws, [14, 24, 44, 36, 36, 16, 32])
+    style_sheet(ws2, [14, 22, 44, 36, 36, 16, 34])
+    wb.save(path)
+
+
+def write_feedback_workbook(path: Path):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "用户修改意见记录"
+    ws.append(
         [
             "反馈时间",
             "反馈来源",
@@ -163,7 +174,7 @@ def write_confirmation_workbook(path: Path, project_name: str):
             "下一步动作",
         ]
     )
-    ws3.append(
+    ws.append(
         [
             "",
             "微信 / 飞书 / 邮件 / 电话 / 会议 / 文件批注 / 其他",
@@ -182,10 +193,7 @@ def write_confirmation_workbook(path: Path, project_name: str):
             "",
         ]
     )
-
-    style_sheet(ws, [14, 24, 44, 36, 36, 16, 32])
-    style_sheet(ws2, [14, 22, 44, 36, 36, 16, 34])
-    style_sheet(ws3, [18, 18, 24, 20, 44, 20, 20, 24, 36, 30, 28, 18, 34, 16, 30])
+    style_sheet(ws, [18, 18, 24, 20, 44, 20, 20, 24, 36, 30, 28, 18, 34, 16, 30])
     wb.save(path)
 
 
@@ -198,10 +206,6 @@ def write_rules(path: Path, project_name: str):
 3. 资产制作完成后，把实际图片文件名和确认项更新回 `项目名_脚本与资产确认表_v01.xlsx`，再提交用户确认。
 4. 用户确认脚本和资产后，进入最终归档 PDF 与内部视频制作阶段。
 
-## 项目接收记录
-新项目开始时，应记录客户原始资料的接收时间、资料名称、资料类型、来源说明、处理动作和当前状态。
-后续生成 `项目执行过程与修改确认归档` 或 `项目执行总结归档` 时，需要把原始脚本接收时间和关键修改节点体现出来。
-
 ## 一级目录说明
 - `01_客户原始资料`：客户提供的脚本、产品素材、品牌素材、参考图、字体授权。
 - `02_用户确认文件`：需要用户填写、选择、反馈的 Excel，核心文件是 `项目名_脚本与资产确认表_v01.xlsx`。
@@ -210,12 +214,14 @@ def write_rules(path: Path, project_name: str):
 - `05_内部制作执行`：最终执行 Prompt 表、首帧/关键帧图、视频片段、成片。Prompt 表直接放在本目录，不单独建立视频 Prompt 文件夹。
 
 ## 设定资产目录规则
-`03_设定资产` 下的子目录不固定。应先阅读脚本、提炼资产类别，再按项目内容创建。
+`03_设定资产` 默认使用固定子目录，不为单个项目临时发明新结构。
 
-示例：
-- 神话/短剧项目：`01_人物设定图`、`02_场景设定图`、`03_道具设定图`、`04_特效关键帧`
-- 汽车广告：`01_车型外观参考`、`02_场景设定图`、`03_驾驶员形象`、`04_动态特效关键帧`
-- 美妆广告：`01_人物模特设定`、`02_产品质感参考`、`03_场景氛围图`、`04_质地特效关键帧`
+固定子目录：
+- `01_人物设定图`
+- `02_场景设定图`
+- `03_产品参考图`
+- `04_道具设定图`
+- `05_特效关键帧`
 
 ## 命名规则
 统一格式：`类型_项目_内容_v版本号.扩展名`
@@ -237,6 +243,7 @@ def write_rules(path: Path, project_name: str):
 - 已确认、需要归档的阶段使用 PDF。
 - 内部制作执行使用 Excel。
 - 不单独创建 `执行版脚本.xlsx` 或 `形象场景描述确认表.xlsx`。相关内容应合并进 `项目名_脚本与资产确认表_v01.xlsx` 或最终内部执行表。
+- 不在 `项目名_脚本与资产确认表_v01.xlsx` 中添加 `项目接收与处理记录` 或 `用户修改意见记录` 工作表。用户修改意见使用 `02_用户确认文件/用户修改意见记录_vNN.xlsx` 单独记录。
 - 不创建 `提示词参考` 或 `视频Prompt` 空目录；Prompt 内容以最终执行 Excel 为准。
 - 不覆盖旧版本文件，修改时递增版本号。
 """
@@ -250,7 +257,7 @@ def main():
     parser.add_argument(
         "--asset-subfolders",
         default="",
-        help="Optional comma-separated subfolders under 03_设定资产, e.g. 人物设定图,场景设定图,道具设定图,特效关键帧",
+        help="Optional comma-separated extra subfolders under 03_设定资产. Use only when the user explicitly requests folders beyond the fixed standard.",
     )
     args = parser.parse_args()
 
@@ -267,6 +274,7 @@ def main():
         root / "02_用户确认文件" / f"{args.project_name}_脚本与资产确认表_v01.xlsx",
         args.project_name,
     )
+    write_feedback_workbook(root / "02_用户确认文件" / "用户修改意见记录_v01.xlsx")
     print(root)
 
 

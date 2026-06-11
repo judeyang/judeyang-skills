@@ -1,44 +1,17 @@
 [
   {
-    "id": "mixed-media-chronological-fcpxml",
-    "prompt": "把这个素材文件夹按拍摄时间做成 Final Cut Pro 时间线，里面有视频、照片和 Live Photo。",
-    "expected_behavior": [
-      "scan the local folder and build a deterministic media manifest",
-      "use metadata order first and filename fallback only when metadata is missing",
-      "convert stills only when Final Cut compatibility requires it",
-      "write FCPXML plus manifest and warnings"
-    ],
-    "must_not": [
-      "reorder files alphabetically when metadata exists",
-      "drop unsupported files without reporting them"
-    ]
+    "id": "fcpx-001",
+    "prompt": "把05_内部制作执行/02_视频片段里的AI视频片段按镜头顺序生成FCPXML。",
+    "expected": "使用--ai-shot-order；按镜头编号排序；同镜头选择最新版_vNN；报告缺号和未编号素材。"
   },
   {
-    "id": "fcp-rejects-import",
-    "prompt": "Final Cut 导入这个 fcpxml 报错，你帮我定位是视频还是照片导致的。",
-    "expected_behavior": [
-      "create reduced video-only and photo-only diagnostics when needed",
-      "validate XML structure before blaming Final Cut",
-      "check still-image handling and duration/frame boundary issues",
-      "produce a concrete remediation path"
-    ],
-    "must_not": [
-      "guess the cause without creating a smaller reproducible file",
-      "erase or overwrite the original export"
-    ]
+    "id": "fcpx-002",
+    "prompt": "把手机相册导出的照片和视频按拍摄时间导入Final Cut Pro。",
+    "expected": "使用默认capture-time排序；处理Live Photo；必要时--convert-stills；输出manifest。"
   },
   {
-    "id": "missing-metadata-tools",
-    "prompt": "我机器上可能没有 exiftool 或 ffprobe，但还是想先生成一个能用的时间线。",
-    "expected_behavior": [
-      "detect missing tools and report them",
-      "fall back to filesystem timestamps or filename order with a warning",
-      "keep the fallback method in the manifest",
-      "recommend exact optional install commands"
-    ],
-    "must_not": [
-      "pretend metadata was read successfully",
-      "fail without explaining the minimum tool needed"
-    ]
+    "id": "fcpx-003",
+    "prompt": "Final Cut Pro导入后提示帧边界警告，帮我排查。",
+    "expected": "使用验证命令检查duration/offset/start/tcStart；必要时生成video-only/photos-only窄测试文件。"
   }
 ]
