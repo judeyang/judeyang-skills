@@ -28,7 +28,7 @@ This is an output contract, not a loose suggestion. Final video prompts must use
 参考素材：人物@文件名控制脸、服装和体态；背景@文件名锁定可见空间；产品@文件名锁定外观、Logo、结构；首帧@文件名作为00:00起始状态；结尾帧@文件名锁定结束状态。没有上传的素材不得写成已使用。
 人物/产品/道具/场景：写本镜头实际可见或必须保持连续的设定。只写会影响画面的事实。
 连续性：写空间轴线、左右关系、座次/站位、产品状态、上一镜头/下一镜头交接。不可用泛泛的“保持连续性”。
-声音：只生成对白、同期环境声、动作音效、产品音效或房间底噪；不需要配乐，不生成BGM，音乐后期单独配。
+声音：只生成对白、同期环境声、动作音效、产品音效或房间底噪；台词按情绪使用自然停顿、重音、尾音和气息控制；不需要配乐，不生成BGM，音乐后期单独配。
 文字策略：默认画面为无文字纯图片。禁止生成字幕、标题、角标、水印、说明文字、乱码、伪Logo、排版边框和UI界面。产品镜头仅保留官方素材中已有的品牌Logo和官方屏显信息，禁止新增文字、伪Logo或屏幕文案。剧情道具镜头如报纸、信件、招牌必须出现文字，只允许少量大字或可后期替换的占位文字，禁止复杂小字和乱码。非产品镜头也必须写本行，不得只在最后一个分镜里补一句“不加字幕”。
 
 【氛围与画质】
@@ -108,7 +108,32 @@ Mandatory base labels:
 
 Do not create a separate `【运镜规则】`. Put camera path, movement speed, focus behavior, axis rules, and allowed/forbidden cuts in each time block's `运镜手法：` and `衔接要求：`.
 
-Do not create a separate `【声音/台词】`. Put global sound limits in `【基础设定】`, and put per-beat dialogue/foley in `【画面内容】` under `声音：`. Spoken lines can use `{台词}` and key sound effects can use `<音效>` when useful.
+Do not create a separate `【声音/台词】`. Put global sound limits in `【基础设定】`, and put per-beat dialogue/foley in `【画面内容】` under `声音：`. Spoken lines must use `{完整原文台词}` when dialogue exists, and key sound effects can use `<音效>` when useful.
+
+For dialogue, read `references/voice_dialogue_rules.md` before writing the final prompt. Use punctuation and delivery notes to control speech:
+- `，` = short natural pause
+- `。` = closed ending or restrained emotion
+- `！` = emphasis or emotional lift
+- `？` = doubt, trial, or rising tail tone
+- `？！` = challenge, disbelief, or burst
+- `……` = emotional blockage or hesitation
+- `~` = soft, light, intimate tail tone
+- `--` = sudden turn, interruption, or self-correction
+
+Write the complete spoken line and the delivery together. The text inside `{}` is source-locked by default:
+
+```text
+声音：角色压低声音说{别动。再往前一步，我就不客气了。}，两个句号都收住，`再往前一步` 放慢重读；保留轻微脚步声和衣料摩擦声。
+```
+
+If the dialogue is client-confirmed or the user says `一字不改`, `原文保留`, `不得修改`, `照抄`, or `法务确认`, preserve every character and punctuation mark inside `{}`. Add delivery guidance outside `{}`; do not add ellipses, split, paraphrase, shorten, or rewrite the line. If a separate performance version is explicitly allowed, keep the original line and label the variant separately.
+
+Dialogue punctuation controls audio only. Never put `{台词}` into visible subtitles, screen text, prop text, captions, UI labels, or watermarks.
+
+If a dialogue shot is split into multiple time-coded blocks, every block's `声音：` must state one of:
+- the complete spoken line in `{}` when the line is delivered in that block
+- an exact source fragment in `{}` plus clear continuation wording when the source line is intentionally split for timing
+- `无新台词` when only breath, reaction sound, room tone, foley, or tail-tone continuation remains
 
 Do not create a separate `【负面要求】` by default. Put text strategy and product/logo/story-prop limits in `【基础设定】`; put visual-quality negatives in `【氛围与画质】`; put action-specific forbidden behavior in the relevant `画面内容` beat.
 
@@ -269,6 +294,27 @@ Keep prompt dialogue aligned with duration:
 - 3 seconds: one short line
 - 4 seconds: one clean product line
 - longer explanation requires longer shot or voiceover
+
+Match delivery to emotion:
+- 撒娇：question/soft-tail feel, light volume, gentle rising tail.
+- 警告：short closed sentences, lower voice, slower key words.
+- 思考：comma/ellipsis/question rhythm, audible hesitation.
+- 愤怒：short lines, challenge or burst, sudden emphasis.
+- 难过：ellipsis plus closed ending, weaker breath, falling tail.
+- 开心：brighter tone, quicker rhythm, light tail.
+- 紧张：unstable pause, hollow breath, uncertain question tail.
+- 怀疑：slower front half, key words stressed, scrutinizing question.
+- 安慰：front half softer, back half steadier, tail tone lands gently.
+- 失望：lighter voice, slower speed, no crying or explosion, tail sinks.
+- 舍不得：pre-speech pause, very light voice, unstable breath, hollow tail.
+- 反派掌控：lower voice, very slow speed, clear pause, downward tail, restrained contempt.
+- 惊讶：brief stunned pause, then higher brighter voice, rising tail, believable disbelief.
+
+For important dialogue, use this compact formula inside each time-coded `声音：` field:
+
+```text
+人物在【场景】里，因为【原因/人物状态】情绪发生变化，声音【变轻/压低/变亮/变稳】，语速【变慢/变快/一字一句】，在【停顿位置】停顿，把【关键词】加重，尾音【发虚/上扬/下压/放柔/稳稳落下】地说：【台词】
+```
 
 ## Forbidden Placeholder Wording
 

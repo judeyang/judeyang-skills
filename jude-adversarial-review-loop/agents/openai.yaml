@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jude Adversarial Review"
+  short_description: "独立审查、只读复核、盲测评分和修复闭环"
+  default_prompt: "Use $jude-adversarial-review-loop to review this diff or deliverable with findings first, then guide a verified fix loop."
+policy:
+  allow_implicit_invocation: true

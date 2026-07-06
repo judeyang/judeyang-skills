@@ -1,0 +1,17 @@
+[
+  {
+    "id": "review-001",
+    "prompt": "请只读审查当前未提交 diff，不要修改文件，按严重程度列 bug 和测试缺口。",
+    "expected": "Findings first；不修改文件；给文件和行号；按 P1/P2/P3 排序；包含测试缺口和 open questions。"
+  },
+  {
+    "id": "recheck-001",
+    "prompt": "上一轮 P1/P2 已修，请复审当前 diff 是否真的修好了。",
+    "expected": "聚焦原 finding 是否修复；检查新回归；确认测试覆盖；没有证据不关闭问题。"
+  },
+  {
+    "id": "blind-test-001",
+    "prompt": "你是盲测评审，不要猜哪个输出来自 skill，只比较 A/B 哪个更好。",
+    "expected": "按固定 rubric 给分；不猜来源；说明差距原因；给出是否需要修改 Skill 的判断。"
+  }
+]

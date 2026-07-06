@@ -96,7 +96,9 @@ All per-shot final video prompts must pass this contract before delivery:
    - first/end/keyframe state
 5. Write the video prompt first.
 6. Compare each video prompt against the original execution row before writing frame prompts:
-   - exact dialogue/voiceover text from `台词/旁白` must appear in the model-facing `视频内容Prompt（含声音/负面）`, not only as `同期台词` or a summary
+   - exact dialogue/voiceover text from `台词/旁白` must appear completely in the model-facing `视频内容Prompt（含声音/负面）`, especially inside the relevant time-coded `声音：{}` field; do not shorten, rewrite, paraphrase, omit, or summarize it
+   - read and apply `references/voice_dialogue_rules.md` whenever a shot contains dialogue, voiceover, whispered lines, shouted lines, or emotional speech
+   - enhance dialogue delivery with pauses, emphasis, breath, tail tone, and emotion cues outside the locked line; do not modify confirmed wording unless the user explicitly allows a separate performance version
    - important visible actions, expressions, props, locations, and transitions from `原始脚本内容` / `确认后执行内容` must be present or explicitly redirected to post-production
    - sound and effect notes from `音效/音乐` must be present as generated sound, synchronous sound, or post-production guidance; do not silently drop them
 7. Decide the keyframe plan from the video prompt and the shot type registry.
@@ -121,7 +123,9 @@ Use these explicit checkpoints to avoid generating the wrong production layer:
 | Asset reference is named but file is missing | Mark `待提供` or `待生成`; do not claim it is uploaded or bound. |
 | Product official asset is missing | Do not invent product shape, logo, screen text, outlet, or material; request official material. |
 | Prompt contains BGM/music generation wording | Remove it from the model-facing video prompt; keep only `不需要配乐，不生成BGM，音乐后期单独配。` |
-| Dialogue exists in `台词/旁白` but only appears as `同期台词` or a summary in `视频内容Prompt` | Insert the exact dialogue into both `声音：` and the relevant `画面内容：` beat so lip-sync, performance, and timing are preserved. |
+| Dialogue exists in `台词/旁白` but only appears as `同期台词` or a summary in `视频内容Prompt` | Insert the complete exact dialogue into the relevant time-coded `声音：{}` field and the relevant `画面内容：` beat so lip-sync, performance, and timing are preserved. |
+| Dialogue is present but has no delivery control | Apply `references/voice_dialogue_rules.md`: identify the emotion, adjust safe punctuation if allowed, and add concrete voice cues such as pause, emphasis, breath, volume, speed, and tail tone. |
+| Confirmed client dialogue must stay exact | Do not rewrite, shorten, reorder, paraphrase, split into incomplete fragments, or change punctuation inside `{}`. Add delivery guidance outside the line. Only create a separate performance version when the user explicitly allows it, and keep the original line alongside it. |
 | Original or confirmed picture content is summarized too aggressively | Restore the missing visible action, location, prop, expression, transition, and end-state details in the relevant time-coded beat. |
 | Original sound/effect notes are missing | Add them to `声音：` as generated synchronous sound/effect or post-production guidance. |
 | Text strategy conflicts with product/story text | Default to no subtitles/watermarks/garbled text; allow only confirmed product text or story-critical prop text. |
@@ -223,6 +227,16 @@ Avoid placeholders such as `按本镜头需要选择`, `根据主体动作采用
 Avoid AI-slop style fillers unless they are anchored to concrete visible choices. Words such as `电影感`, `高级感`, `震撼`, `精致`, `氛围感`, `大片感`, and `质感` do not control generation by themselves. If used, tie them to lens, lighting, color, material, camera movement, blocking, or texture.
 
 Do not ask the video tool to generate music, BGM, underscore, score, or background music. Always keep music as post-production guidance outside generation. In the model-facing video prompt, explicitly write `不需要配乐，不生成BGM，音乐后期单独配。`
+
+Dialogue and voice delivery:
+- Before writing a dialogue shot, read `references/voice_dialogue_rules.md`.
+- In `【基础设定】` `声音：`, keep the global sound boundary and mention that dialogue uses natural pauses, emphasis, tail tone, breath, and emotional delivery.
+- In each time-coded `声音：`, include the complete original spoken line in `{}` plus a concrete delivery note. Example shape: `声音：角色压低声音说{别动。再往前一步，我就不客气了。}，关键字放慢重读；保留轻微脚步声。`
+- Use punctuation as voice control: comma for short natural pause, period for closed ending, exclamation for emphasis, question mark for uncertainty, `？！` for challenge/explosion, ellipsis for emotional blockage, `~` for soft/light tail tone, and `--` for turn or interruption.
+- Match punctuation and delivery to emotion. At minimum distinguish 开心/兴奋、撒娇/亲近、警告/压迫、思考/犹豫、愤怒/质问、难过/委屈、紧张/害怕、怀疑/试探、安慰/温柔坚定、失望/心寒、舍不得/挽留、反派/掌控感、惊讶/不敢相信; they should not all sound the same.
+- For important dialogue, use the scene formula from `references/voice_dialogue_rules.md`: scene + character state/reason + voice size + speed + breath + pause + stress + tail tone + exact line.
+- If the user says `一字不改`, `客户确认`, `原文保留`, `不得修改`, `照抄`, or `法务确认`, the text inside `{}` must match the source line exactly, including punctuation; delivery notes must sit outside `{}`.
+- Do not add subtitles or on-screen text because dialogue punctuation is for generated speech only.
 
 For Seedance-oriented prompts, write explicit reference roles in `【基础设定】`, such as:
 `首帧@镜头03_首帧_v02.png作为00:00起始状态；中间关键帧不使用，以分镜动作和运镜控制中段；结尾帧@镜头03_结尾帧_v02.png锁定镜头结束状态。`

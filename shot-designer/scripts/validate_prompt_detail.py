@@ -41,6 +41,8 @@ ALLOWED_TEXT_MARKERS = ["文字策略", "产品镜头仅保留官方素材", "�
 FULL_PATH_MARKERS = ["/Users/", "\\Users\\", "file://"]
 MUSIC_PROMPT_MARKERS = ["音乐/音效：", "古筝", "琵琶", "背景乐", "合奏", "轮指", "变奏"]
 MUSIC_BOUNDARY_MARKERS = ["不需要配乐", "不生成BGM", "不生成音乐/BGM", "不生成音乐", "不要配乐"]
+DIALOGUE_BRACE_RE = re.compile(r"[{｛【](.*?)[}｝】]")
+SOUND_LINE_RE = re.compile(r"声音：(?P<value>.*?)(?:\n\S+：|\Z)", re.S)
 KEYFRAME_FILE_RE = re.compile(
     r"镜头\d+_(?:首帧|中间关键帧[A-Z]?|结尾帧)(?:_[^\\s；;,，。]+)?_v\\d+(?:_[^\\s；;,，。]+)?\\.(?:png|jpg|jpeg|webp)"
 )
@@ -271,6 +273,17 @@ def dialogue_fragments(dialogue: str) -> list[str]:
     return [text]
 
 
+def dialogue_locked_in_sound(prompt: str, fragment: str) -> bool:
+    normalized_fragment = normalize_source_text(fragment)
+    if not normalized_fragment:
+        return True
+    sound_text = "\n".join(match.group("value") for match in SOUND_LINE_RE.finditer(prompt))
+    if not sound_text:
+        return False
+    braced_parts = DIALOGUE_BRACE_RE.findall(sound_text)
+    return any(normalized_fragment in normalize_source_text(part) for part in braced_parts)
+
+
 def source_terms(text: str) -> list[str]:
     seen: set[str] = set()
     terms: list[str] = []
@@ -355,6 +368,8 @@ def main() -> int:
         for fragment in dialogue_fragments(dialogue_text):
             if normalize_source_text(fragment) not in normalize_source_text(prompt):
                 errors.append(f"镜头 {shot}: `台词/旁白` 中的完整台词未出现在视频Prompt中：{fragment}")
+            elif not dialogue_locked_in_sound(prompt, fragment):
+                errors.append(f"镜头 {shot}: `台词/旁白` 中的完整台词必须出现在 time-coded `声音：{{...}}` 中，不能只写在画面内容或摘要里：{fragment}")
         for term in source_terms(picture_text):
             if not source_term_present(term, prompt):
                 errors.append(f"镜头 {shot}: `确认后执行内容` 要点未出现在视频Prompt中：{term}")
