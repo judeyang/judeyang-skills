@@ -23,6 +23,12 @@ REQUIRED_EXECUTION_HEADINGS = (
     "## 发布前检查",
     "## 发布后回收",
 )
+REDUNDANT_EXECUTION_HEADINGS = (
+    "## 总拍摄发布表",
+    "## 原视频参考与节奏复刻依据",
+)
+PUBLISH_TIME_RE = re.compile(r"20\d{2}-\d{2}-\d{2}[^\n]*\d{1,2}:\d{2}")
+PUBLISH_TIME_CONFIRMATION = "发布时间状态：已由主编确认"
 MAIN_XHS_LABELS = (
     "适合谁：",
     "先看什么：",
@@ -107,7 +113,7 @@ def shot_table_speech(body: str) -> str:
         if not line.startswith("|") or line.startswith("|---"):
             continue
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if len(cells) >= 6 and re.fullmatch(r"\d+", cells[0]):
+        if len(cells) >= 4 and re.fullmatch(r"\d+", cells[0]):
             chunks.append(cells[2])
     return "".join(chunks)
 
@@ -143,13 +149,16 @@ def add_sync_findings(
 ) -> None:
     mismatches: list[str] = []
     shot_mismatches: list[str] = []
+    missing_shot_tables: list[str] = []
     for section_id in sorted(set(execution_sections) & set(speaker_sections)):
         execution_speech = table_field(execution_sections[section_id]["body"], "口播全文")
         speaker_speech = first_speech_line(speaker_sections[section_id]["body"])
         if not execution_speech or execution_speech != speaker_speech:
             mismatches.append(section_id)
         shot_speech = shot_table_speech(execution_sections[section_id]["body"])
-        if shot_speech and normalize_speech(shot_speech) != normalize_speech(execution_speech):
+        if not shot_speech:
+            missing_shot_tables.append(section_id)
+        elif normalize_speech(shot_speech) != normalize_speech(execution_speech):
             shot_mismatches.append(section_id)
     if mismatches:
         findings.append(
@@ -160,6 +169,13 @@ def add_sync_findings(
             Finding(
                 "SHOT_SPEECH_SYNC_MISMATCH",
                 f"02 的口播全文与逐镜头台词不一致：{', '.join(shot_mismatches)}。",
+            )
+        )
+    if missing_shot_tables:
+        findings.append(
+            Finding(
+                "SHOT_TABLE_MISSING",
+                "02 缺少可核验的逐镜头台词表：" + ", ".join(missing_shot_tables) + "。",
             )
         )
 
@@ -210,6 +226,19 @@ def add_execution_findings(
     if missing_headings:
         findings.append(
             Finding("EXEC_CHECKLIST_MISSING", "02 缺少：" + "、".join(missing_headings) + "。")
+        )
+
+    redundant_headings = [
+        heading for heading in REDUNDANT_EXECUTION_HEADINGS if heading in execution_text
+    ]
+    if redundant_headings:
+        findings.append(
+            Finding(
+                "EXEC_REDUNDANT_AGGREGATE",
+                "02 不应重复堆放总表；逐条脚本内保留一行参考即可："
+                + "、".join(redundant_headings)
+                + "。",
+            )
         )
 
     xhs_bodies: dict[str, str] = {}
@@ -288,6 +317,22 @@ def add_execution_findings(
             )
 
 
+def add_schedule_findings(findings: list[Finding], chief_text: str, execution_text: str) -> None:
+    offenders = []
+    for role, text in (("01", chief_text), ("02", execution_text)):
+        if PUBLISH_TIME_RE.search(text) and PUBLISH_TIME_CONFIRMATION not in text:
+            offenders.append(role)
+    if offenders:
+        findings.append(
+            Finding(
+                "UNCONFIRMED_PUBLISH_TIME",
+                "不得替主编生成具体发布日期或时段；发现未确认时间："
+                + "、".join(offenders)
+                + "。",
+            )
+        )
+
+
 def audit(
     chief_text: str,
     execution_text: str,
@@ -303,6 +348,7 @@ def audit(
     add_sync_findings(findings, execution_sections, speaker_sections)
     add_speaker_findings(findings, speaker_text, speaker_sections)
     add_execution_findings(findings, execution_text, execution_sections)
+    add_schedule_findings(findings, chief_text, execution_text)
 
     if re.search(r"(?:贴合度|覆盖率).*100%|38/38\s*=\s*100%", chief_text):
         missing_relation = [

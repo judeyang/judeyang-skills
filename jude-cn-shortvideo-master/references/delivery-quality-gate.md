@@ -35,14 +35,13 @@ Required global sections:
 - `执行团队只看`
 - `执行团队审核`
 - `拍摄与交付规范`
-- `总拍摄发布表`
 - `发布前检查`
 - `发布后回收`
 
 Each item needs:
 
-- publish time and content type
-- `来源关系` with separate content and structure references
+- content type
+- one compact, linked `来源关系` line with separate content and structure references
 - exact spoken text synchronized with `03`
 - duration
 - cover and platform title
@@ -50,6 +49,10 @@ Each item needs:
 - finished Xiaohongshu title and body
 - topic-specific shot table
 - privacy and compliance notes
+
+Do not infer exact dates, weekdays, posting times, frequency, or a six-week calendar. When the chief editor has not explicitly confirmed a calendar, keep only the relative item order.
+
+Do not include `总拍摄发布表`, `原视频参考与节奏复刻依据`, or a repeated heat table in the default `02`. Shared rules appear once. Each item uses a compact four-column shot table: `镜头 / 时间 / 口播 / 画面`.
 
 The production specification should state at least:
 

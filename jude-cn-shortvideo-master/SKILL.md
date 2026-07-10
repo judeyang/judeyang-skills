@@ -11,7 +11,7 @@ After platform and quantity confirmation, produce exactly three human-facing fil
 
 | File | Reader | Must contain |
 |---|---|---|
-| `01-<project>-主编操盘手全局总控.md` | 主编/操盘手 | source lock, selection logic, counts, schedule, source evidence, platform decisions, risks, final go/no-go |
+| `01-<project>-主编操盘手全局总控.md` | 主编/操盘手 | source lock, selection logic, counts, publishing order, source evidence, platform decisions, risks, final go/no-go |
 | `02-<project>-执行团队拍摄发布脚本.md` | 拍摄/剪辑/运营 | production specs, item-specific shots, props, subtitles, covers, publish-ready platform copy, pre/post-publish checks |
 | `03-<project>-余教授本人提词表演稿.md` | 出镜人 | exact spoken lines, performance cues, forbidden wording, professional blockers |
 
@@ -21,11 +21,13 @@ No fourth human entry file. Process logs are created only when the user asks and
 
 ### 01 主编只看
 
-Keep strategy, source choices, heat evidence, editorial tradeoffs, compliance summary, publishing rhythm, and cross-role approval here.
+Keep strategy, source choices, essential heat evidence, editorial tradeoffs, compliance summary, publishing order, and cross-role approval here. Add calendar dates or posting times only after the chief editor explicitly confirms them.
 
 ### 02 执行团队只看
 
 Keep camera, action, props, subtitles, cover, platform fields, naming, delivery, publishing, and data collection here.
+
+State shared rules once. Do not repeat the same privacy, subtitle, CTA, delivery, or compliance sentence under every item.
 
 Every final `02` must include:
 
@@ -91,6 +93,8 @@ Ask for exact counts after platform confirmation:
 - Vlog 多少条？
 
 Recommendation is not confirmation. Never infer counts or silently reduce a real project to a sample. Write confirmed counts into all three files.
+
+Do not infer publishing dates, weekdays, times, frequency, or a six-week calendar from the item count. Unless the chief editor explicitly confirms a calendar, keep only a relative item order and state `具体发布时间待主编确认`.
 
 ### 4. Source Relationship Before Drafting
 
@@ -158,6 +162,22 @@ Reject the pack when a generic visual placeholder appears in more than 25% of it
 
 `sync_teleprompter_to_shooting.py` can create a scaffold only. Never deliver its raw generic output as final `02`.
 
+### 8.1 Execution Concision Gate
+
+The default final `02` has:
+
+1. shared production/publishing rules once
+2. one compact block per item: type, one linked source-relationship line, exact speech, duration, cover/title, finished platform copy
+3. a compact shot table: `镜头 / 时间 / 口播 / 画面`
+
+Do not add these aggregate tables to `02` unless the user explicitly requests them:
+
+- `总拍摄发布表`
+- `原视频参考与节奏复刻依据`
+- item-by-item heat-number table
+
+Keep the original-video link inside each item’s `来源关系` line. Heat numbers and editorial comparison belong in `01` only when the chief editor needs them.
+
 ### 9. Mandatory Automated Gates
 
 Run all commands on the actual canonical files:
@@ -178,7 +198,7 @@ For each blocker include:
 
 | Owner | File | Typical blockers |
 |---|---|---|
-| 主编 | `01` | platform choice, source relationship, editorial risk, schedule, final release |
+| 主编 | `01` | platform choice, source relationship, editorial risk, publishing order, confirmed calendar, final release |
 | 执行团队 | `02` | location, props, privacy-safe material, shot feasibility, cover/subtitle/publish operations |
 | 余教授 | `03` | professional accuracy, personal wording, oral boundary, forbidden claims |
 
@@ -231,6 +251,8 @@ Stop delivery and keep `待人工审查` when any of these remain:
 - Vlog Xiaohongshu copy uses a medical consultation template
 - source relationship is not classified
 - generic shot placeholders dominate `02`
+- `01` or `02` contains specific dates/times that the chief editor did not confirm
+- `02` repeats global schedule/source tables instead of keeping one compact reference line per item
 - automated gates fail
 - any role-specific human blocker is open
 

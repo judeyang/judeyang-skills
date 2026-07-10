@@ -164,6 +164,24 @@ BAD_SPEAKER = """# 03 余教授本人提词表演稿
 
 
 class DeliveryQualityAuditTest(unittest.TestCase):
+    @staticmethod
+    def compact_shot_tables(text: str) -> str:
+        lines = []
+        for line in text.splitlines():
+            if line == "| 镜头 | 时间 | 口播 | 画面 | 字幕 | 注意 |":
+                lines.append("| 镜头 | 时间 | 口播 | 画面 |")
+            elif line == "|---|---:|---|---|---|---|":
+                lines.append("|---|---:|---|---|")
+            elif line.startswith("|"):
+                cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+                if len(cells) == 6 and cells[0].isdigit():
+                    lines.append("| " + " | ".join(cells[:4]) + " |")
+                else:
+                    lines.append(line)
+            else:
+                lines.append(line)
+        return "\n".join(lines) + "\n"
+
     def run_audit(self, chief: str, execution: str, speaker: str):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -218,6 +236,37 @@ class DeliveryQualityAuditTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("QUALITY_GATE_PASS", result.stdout)
+
+    def test_compact_shot_table_still_checks_spoken_line_sync(self):
+        compact = self.compact_shot_tables(GOOD_EXECUTION)
+        broken = compact.replace(
+            "| 1 | 0-3s | 面诊先别急着问能不能做。 |",
+            "| 1 | 0-3s | 这句被错误改写。 |",
+            1,
+        )
+
+        good_result = self.run_audit(GOOD_CHIEF, compact, GOOD_SPEAKER)
+        broken_result = self.run_audit(GOOD_CHIEF, broken, GOOD_SPEAKER)
+
+        self.assertEqual(good_result.returncode, 0, good_result.stdout + good_result.stderr)
+        self.assertNotEqual(broken_result.returncode, 0)
+        self.assertIn("SHOT_SPEECH_SYNC_MISMATCH", broken_result.stdout)
+
+    def test_rejects_unconfirmed_publish_time_and_redundant_execution_tables(self):
+        execution = GOOD_EXECUTION.replace(
+            "## 拍摄与交付规范",
+            "## 总拍摄发布表\n\n| 发布时间 | 编号 |\n|---|---|\n"
+            "| 2026-07-13 周一 20:30 | T01 |\n\n"
+            "## 原视频参考与节奏复刻依据\n\n重复总表。\n\n"
+            "## 拍摄与交付规范",
+            1,
+        )
+
+        result = self.run_audit(GOOD_CHIEF, execution, GOOD_SPEAKER)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("UNCONFIRMED_PUBLISH_TIME", result.stdout)
+        self.assertIn("EXEC_REDUNDANT_AGGREGATE", result.stdout)
 
     def test_accepts_nonmedical_main_video_without_fake_consultation_prep(self):
         medical_xhs = (
