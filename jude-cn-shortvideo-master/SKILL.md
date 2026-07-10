@@ -125,6 +125,12 @@ For medical explanatory main videos, Xiaohongshu uses:
 
 `适合谁 / 先看什么 / 面诊前准备 / 避坑 / 收藏点 / 评论引导`.
 
+For non-medical main videos such as content review, filming methods, or data analysis, Xiaohongshu uses:
+
+`适合谁 / 先看什么 / 执行要点 / 避坑 / 收藏点 / 评论引导`.
+
+Do not invent `面诊前准备` merely because the item ID starts with `T`.
+
 For doctor-life or production Vlogs, Xiaohongshu uses:
 
 `适合谁 / 观众能看到什么 / 拍摄观察点 / 隐私边界 / 收藏点 / 评论引导`.

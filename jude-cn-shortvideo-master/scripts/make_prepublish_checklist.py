@@ -25,6 +25,14 @@ CHECKLISTS = {
         "评论引导是否只收集问题类型，不判断个人方案",
         "是否没有私信导流、价格、预约暗示",
     ],
+    "xhs-main-nonmedical": [
+        "标题是否明确这是内容复盘、制作方法或运营判断",
+        "正文是否包含适合谁、先看什么、执行要点、避坑、收藏点、评论引导",
+        "是否没有为了套模板强写面诊前准备",
+        "执行要点是否给出可操作的时间、指标或步骤",
+        "是否没有展示后台账号、用户资料、私信或未公开数据",
+        "评论引导是否为主题投票，不延伸个人医疗判断",
+    ],
     "xhs-vlog": [
         "标题是否明确这是医生日常、科普制作或场景观察",
         "正文是否包含适合谁、观众能看到什么、拍摄观察点、隐私边界",
@@ -75,7 +83,7 @@ def main() -> int:
     if args.platform == "all":
         platforms = list(CHECKLISTS)
     elif args.platform == "xhs":
-        platforms = ["xhs-main", "xhs-vlog"]
+        platforms = ["xhs-main", "xhs-main-nonmedical", "xhs-vlog"]
     else:
         platforms = [args.platform]
     report = build(platforms)

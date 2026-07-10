@@ -17,16 +17,39 @@ PATTERNS = {
     "diagnosis_to_viewer": r"你就是|你必须做|你适合做|你不适合做|你这个必须",
 }
 
+SAFEGUARD_RE = re.compile(
+    r"不说|不写|不用|不承诺|不(?:临时)?添加|不展示|不拍(?:摄)?|不出现|不保存|不转发|"
+    r"不放|不包含|不含|不提供|不根据|不判断|不索要|不发送|不比较|不得|禁止|"
+    r"别公开|别展示|避免(?:使用|展示|出现|泄露|拍摄|写)|未(?:展示|包含|使用)|"
+    r"只用空白|素材隔离|扫描"
+)
 
-def scan(path: Path) -> int:
+
+def is_safeguard_line(line: str, first_risk_index: int) -> bool:
+    """Return true when every matched term sits after an explicit prohibition marker."""
+    return any(match.end() <= first_risk_index for match in SAFEGUARD_RE.finditer(line))
+
+
+def scan(path: Path) -> tuple[int, int]:
     text = path.read_text(encoding="utf-8", errors="ignore")
     total = 0
+    safeguard_lines = 0
     for lineno, line in enumerate(text.splitlines(), 1):
+        matches = []
         for category, pattern in PATTERNS.items():
-            if re.search(pattern, line):
-                print(f"{path}:{lineno}: [{category}] {line.strip()}")
-                total += 1
-    return total
+            match = re.search(pattern, line)
+            if match:
+                matches.append((category, match))
+        if not matches:
+            continue
+        first_risk_index = min(match.start() for _, match in matches)
+        if is_safeguard_line(line, first_risk_index):
+            safeguard_lines += 1
+            continue
+        for category, _ in matches:
+            print(f"{path}:{lineno}: [{category}] {line.strip()}")
+            total += 1
+    return total, safeguard_lines
 
 
 def main(argv: list[str]) -> int:
@@ -35,8 +58,12 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv[1:])
 
     total = 0
+    safeguard_lines = 0
     for path in args.files:
-        total += scan(path)
+        path_total, path_safeguards = scan(path)
+        total += path_total
+        safeguard_lines += path_safeguards
+    print(f"Safeguard-only lines: {safeguard_lines}")
     print(f"Total findings: {total}")
     return 1 if total else 0
 

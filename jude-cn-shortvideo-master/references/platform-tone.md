@@ -16,6 +16,7 @@
 - Doctor-life Vlog structure: `场景钩子 -> 观众能看到什么 -> 拍摄观察点 -> 隐私边界 -> 收藏提醒`.
 - Tone: experience note, not sales pitch.
 - Do not force `面诊前准备` into filming, props, script-writing, or content-review Vlogs.
+- For non-medical main videos about content review, production, or data, replace `面诊前准备` with `执行要点`.
 - Avoid: exaggerated emojis, fake personal experience, guaranteed outcomes.
 
 ## 微博

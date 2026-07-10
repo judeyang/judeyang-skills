@@ -31,6 +31,14 @@ MAIN_XHS_LABELS = (
     "收藏点：",
     "评论引导：",
 )
+NONMEDICAL_MAIN_XHS_LABELS = (
+    "适合谁：",
+    "先看什么：",
+    "执行要点：",
+    "避坑：",
+    "收藏点：",
+    "评论引导：",
+)
 VLOG_XHS_LABELS = (
     "适合谁：",
     "观众能看到什么：",
@@ -220,8 +228,14 @@ def add_execution_findings(
         elif section_id.startswith("V"):
             if any(label not in xhs for label in VLOG_XHS_LABELS) or "面诊前准备：" in xhs:
                 vlog_schema_errors.append(section_id)
-        elif any(label not in xhs for label in MAIN_XHS_LABELS):
-            main_schema_errors.append(section_id)
+        else:
+            required_labels = (
+                NONMEDICAL_MAIN_XHS_LABELS if "执行要点：" in xhs else MAIN_XHS_LABELS
+            )
+            if any(label not in xhs for label in required_labels):
+                main_schema_errors.append(section_id)
+            if "执行要点：" in xhs and "面诊前准备：" in xhs:
+                main_schema_errors.append(section_id)
 
         relation = table_field(body, "来源关系")
         if "内容参考" not in relation or "结构参考" not in relation:

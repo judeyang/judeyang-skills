@@ -90,6 +90,14 @@ Use complete sentences under:
 
 The preparation must fit the exact topic. Do not paste `自然光照片 + 时间线` into every subject.
 
+### Non-Medical Main Video
+
+For content review, filming methods, production workflow, or data analysis, use complete sentences under:
+
+`适合谁 / 先看什么 / 执行要点 / 避坑 / 收藏点 / 评论引导`.
+
+Do not force a fake `面诊前准备` section into a non-medical main video.
+
 ### Doctor-Life Or Production Vlog
 
 Use complete sentences under:

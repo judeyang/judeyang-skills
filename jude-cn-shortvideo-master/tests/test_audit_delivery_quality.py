@@ -219,6 +219,30 @@ class DeliveryQualityAuditTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("QUALITY_GATE_PASS", result.stdout)
 
+    def test_accepts_nonmedical_main_video_without_fake_consultation_prep(self):
+        medical_xhs = (
+            "| 小红书正文 | 适合谁：恢复期容易被每日变化影响的人。<br>"
+            "先看什么：先看时间线和变化趋势。<br>"
+            "面诊前准备：带上同角度照片和复诊记录。<br>"
+            "避坑：不要自行增加刺激性护理。<br>"
+            "收藏点：固定角度、固定光线、固定日期。<br>"
+            "评论引导：只投票问题类型。 |"
+        )
+        operational_xhs = (
+            "| 小红书正文 | 适合谁：负责首批内容复盘的主编和运营。<br>"
+            "先看什么：分开看前三秒、完播、收藏和评论。<br>"
+            "执行要点：按 24 小时和 72 小时回收同一组指标。<br>"
+            "避坑：不要用单个点赞数代替全部判断。<br>"
+            "收藏点：保存四类指标与下一轮选题的对应关系。<br>"
+            "评论引导：只投票下一期想看的指标。 |"
+        )
+        execution = GOOD_EXECUTION.replace(medical_xhs, operational_xhs)
+
+        result = self.run_audit(GOOD_CHIEF, execution, GOOD_SPEAKER)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("QUALITY_GATE_PASS", result.stdout)
+
     def test_xiaohongshu_checklist_separates_main_video_and_vlog(self):
         result = subprocess.run(
             [sys.executable, str(CHECKLIST_SCRIPT), "--platform", "xhs"],
@@ -229,6 +253,7 @@ class DeliveryQualityAuditTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("## xhs-main", result.stdout)
+        self.assertIn("## xhs-main-nonmedical", result.stdout)
         self.assertIn("## xhs-vlog", result.stdout)
         vlog_block = result.stdout.split("## xhs-vlog", 1)[1]
         self.assertIn("观众能看到什么", vlog_block)
