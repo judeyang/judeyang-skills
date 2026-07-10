@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img alt="Skills" src="https://img.shields.io/badge/Skills-7-111827">
+  <img alt="Skills" src="https://img.shields.io/badge/Skills-8-111827">
   <img alt="Runtime" src="https://img.shields.io/badge/Runtime-SKILL.md-334155">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-0f766e">
 </p>
@@ -35,6 +35,7 @@ JudeYang 自用并开源的 Agent Skills 合集。每个目录都是一个可独
 | [`jude-project-operator`](jude-project-operator/) | 项目进入、开发修改、验证、Git 和文档闭环。 | [`SKILL.md`](jude-project-operator/SKILL.md) |
 | [`jude-adversarial-review-loop`](jude-adversarial-review-loop/) | 独立审查、只读复核、盲测评分和修复闭环。 | [`SKILL.md`](jude-adversarial-review-loop/SKILL.md) |
 | [`jude-workflow-to-skill-factory`](jude-workflow-to-skill-factory/) | 把重复提示、评分表和流程沉淀成可验证 Skill。 | [`SKILL.md`](jude-workflow-to-skill-factory/SKILL.md) |
+| [`jude-cn-shortvideo-master`](jude-cn-shortvideo-master/) | 把医生知识库和逐字稿变成经过角色、平台、来源与可执行性硬审计的三文件短视频交付。 | [`SKILL.md`](jude-cn-shortvideo-master/SKILL.md) |
 
 ### 推荐安装
 
@@ -47,6 +48,7 @@ cp -R judeyang-skills/fcpx-timeline ~/.codex/skills/
 cp -R judeyang-skills/jude-project-operator ~/.codex/skills/
 cp -R judeyang-skills/jude-adversarial-review-loop ~/.codex/skills/
 cp -R judeyang-skills/jude-workflow-to-skill-factory ~/.codex/skills/
+cp -R judeyang-skills/jude-cn-shortvideo-master ~/.codex/skills/
 ```
 
 ### 组合关系
@@ -57,6 +59,7 @@ cp -R judeyang-skills/jude-workflow-to-skill-factory ~/.codex/skills/
 `jude-project-operator` 是所有项目开发和知识管理任务的进入与验收层。  
 `jude-adversarial-review-loop` 负责独立审查、复审和盲测。  
 `jude-workflow-to-skill-factory` 负责把高频重复流程沉淀成新 Skill。
+`jude-cn-shortvideo-master` 负责医生 IP 的素材锁定、平台与数量确认、三角色交付和质量硬门槛。
 
 ### 校验命令
 
@@ -65,6 +68,7 @@ python shot-designer/scripts/validate_prompt_detail.py --input workbook.xlsx
 python wes-anderson/scripts/validate_workbook_structure.py workbook.xlsx --type client
 python3 fcpx-timeline/scripts/validate-fcpxml.py timeline.fcpxml --fps 30
 node tujinpdf/scripts/validate-output.mjs output.html output.pdf preview.png
+python3 -m unittest jude-cn-shortvideo-master/tests/test_audit_delivery_quality.py -v
 ```
 
 ---
@@ -84,6 +88,7 @@ JudeYang's open-source Agent Skills collection. Each subdirectory is independent
 | [`jude-project-operator`](jude-project-operator/) | Project entry, scoped changes, validation, Git status, and documentation closure. | [`SKILL.md`](jude-project-operator/SKILL.md) |
 | [`jude-adversarial-review-loop`](jude-adversarial-review-loop/) | Independent reviews, read-only rechecks, blind tests, and verified fix loops. | [`SKILL.md`](jude-adversarial-review-loop/SKILL.md) |
 | [`jude-workflow-to-skill-factory`](jude-workflow-to-skill-factory/) | Turning repeated prompts, rubrics, and workflows into validated reusable Skills. | [`SKILL.md`](jude-workflow-to-skill-factory/SKILL.md) |
+| [`jude-cn-shortvideo-master`](jude-cn-shortvideo-master/) | Turning doctor knowledge bases and transcripts into role-pure, platform-specific, source-audited short-video delivery files. | [`SKILL.md`](jude-cn-shortvideo-master/SKILL.md) |
 
 ### Install
 
@@ -96,6 +101,7 @@ cp -R judeyang-skills/fcpx-timeline ~/.codex/skills/
 cp -R judeyang-skills/jude-project-operator ~/.codex/skills/
 cp -R judeyang-skills/jude-adversarial-review-loop ~/.codex/skills/
 cp -R judeyang-skills/jude-workflow-to-skill-factory ~/.codex/skills/
+cp -R judeyang-skills/jude-cn-shortvideo-master ~/.codex/skills/
 ```
 
 ### How They Work Together
@@ -106,6 +112,7 @@ cp -R judeyang-skills/jude-workflow-to-skill-factory ~/.codex/skills/
 `jude-project-operator` is the entry and closure layer for project work.  
 `jude-adversarial-review-loop` handles independent reviews, rechecks, and blind tests.  
 `jude-workflow-to-skill-factory` turns repeated workflows into new validated Skills.
+`jude-cn-shortvideo-master` governs doctor-IP source intake, platform/count checkpoints, three-role delivery, and hard quality gates.
 
 ### Validation
 
@@ -114,6 +121,7 @@ python shot-designer/scripts/validate_prompt_detail.py --input workbook.xlsx
 python wes-anderson/scripts/validate_workbook_structure.py workbook.xlsx --type client
 python3 fcpx-timeline/scripts/validate-fcpxml.py timeline.fcpxml --fps 30
 node tujinpdf/scripts/validate-output.mjs output.html output.pdf preview.png
+python3 -m unittest jude-cn-shortvideo-master/tests/test_audit_delivery_quality.py -v
 ```
 
 ---
