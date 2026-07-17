@@ -1,6 +1,6 @@
 ---
 name: jude-adversarial-review-loop
-description: JudeYang 独立审查、对抗评审、只读复核、修复闭环 Skill。Use when the user asks for review, 复核, 对抗审查, 独立审查, blind test, A/B evaluation, code review, product-flow review, security second review, or when a risky deliverable needs an independent pass before acceptance.
+description: Auto-use for JudeYang review and verification work: code review, product-flow review, document review, risk review, security/privacy second pass, blind test, A/B evaluation, independent read-only review, fix-loop verification, or checking whether a deliverable is correct enough to accept. Trigger on prompts such as 审查, 复核, 检查, 看看有没有问题, 是否合适, 是否正确, 对抗审查, 独立审查, blind test, 再验证一遍.
 ---
 
 # Jude Adversarial Review Loop

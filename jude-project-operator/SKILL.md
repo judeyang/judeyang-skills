@@ -1,6 +1,6 @@
 ---
 name: jude-project-operator
-description: JudeYang 项目进入、开发修改、验证、Git 状态、文档同步和交付闭环 Skill。Use when working in any JudeYang development, knowledge-management, product, tool, or content project; when the user asks to fix, build, review, organize, update docs, or continue project work; or when Codex needs to avoid project/path mix-ups and high-risk actions.
+description: Auto-use for JudeYang project work: entering a project, continuing prior work, modifying code/docs/config, fixing bugs, building tools/products, organizing knowledge projects, migrating files, checking Git status, updating ROADMAP/docs, validating delivery, or avoiding project/path mix-ups and red-line actions. Trigger on Chinese prompts such as 继续, 修一下, 做完, 迁移项目, 整理项目, 更新文档, 跑验证, 看看这个项目.
 ---
 
 # Jude Project Operator

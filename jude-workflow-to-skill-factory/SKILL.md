@@ -1,6 +1,6 @@
 ---
 name: jude-workflow-to-skill-factory
-description: Convert JudeYang's repeated prompts, delivery procedures, rubrics, and project workflows into concise reusable Codex Skills. Use when the user asks to create/update Skills, extract workflows from history, reduce repeated prompting, formalize a process, build test prompts, run blind evaluations, or improve self-authored skills.
+description: Auto-use when JudeYang wants repeated prompts, manual instructions, rubrics, delivery formats, project procedures, review loops, or recurring workflows turned into reusable Codex Skills, templates, scripts, routing rules, or test prompts. Trigger on prompts such as 以后自动执行, 不要我每次说, 沉淀成 Skill, 转成工作流, 生成 Skill, 更新 Skill, 提炼流程, 重复提示, 工作流模板, 盲测 Skill.
 ---
 
 # Jude Workflow To Skill Factory
