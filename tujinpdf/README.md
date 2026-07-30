@@ -1,4 +1,4 @@
-# 土金PDF
+# 土金杂志风PDF
 
 [English](README_EN.md) | 中文
 
@@ -125,10 +125,10 @@ HTML 源文件必须保留，后续修改应在原 HTML 上迭代，不要每次
 Skill 内置浏览器渲染脚本：
 
 ```bash
-node scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
+node scripts/render-html-pdf.js input.html output.pdf --screenshot preview.png
 ```
 
-脚本会优先使用可用的 Puppeteer；如果 Puppeteer 自带 Chrome 缺失，会尝试本机 Chrome。
+脚本会优先使用可用的 Puppeteer；没有 Puppeteer 或其自带 Chrome 不可用时，会回退到本机 Chrome 的 headless 模式。
 
 ---
 
@@ -180,12 +180,16 @@ tujinpdf/
 ├── SKILL.md
 ├── README.md
 ├── README_EN.md
+├── package.json
 ├── agents/
 │   └── openai.yaml
 ├── references/
 │   └── fatepaw-style-notes.md
-└── scripts/
-    └── render-html-pdf.mjs
+├── scripts/
+│   ├── render-html-pdf.js
+│   └── validate-output.mjs
+└── templates/
+    └── base-a4.html
 ```
 
 ---

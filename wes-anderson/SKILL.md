@@ -1,6 +1,6 @@
 ---
-name: 韦斯安德森项目领航
-description: AI short-video project pilot for scripts, client confirmation workbooks, asset workflows, final confirmation PDFs, revision tracking, and internal prompt tables. Trigger on AI短剧项目领航、脚本审核、脚本与资产确认表、设定资产制作表、人物/场景/产品设定图、用户修改意见、确认归档、韦斯安德森项目领航. This is not a director-style prompt skill. MUST end active responses with exactly four lines: 本阶段已完成 / CHECKPOINT · 当前需要你确认/提供 / 确认后我将进入 / 暂不执行的内容.
+name: wes-anderson
+description: "AI short-video project pilot for scripts, client confirmation workbooks, asset workflows, final confirmation PDFs, revision tracking, and internal prompt tables. Trigger on AI短剧项目领航、脚本审核、脚本与资产确认表、设定资产制作表、人物/场景/产品设定图、用户修改意见、确认归档、韦斯安德森项目领航. This is not a director-style prompt skill. MUST end active responses with exactly four lines: 本阶段已完成 / CHECKPOINT · 当前需要你确认/提供 / 确认后我将进入 / 暂不执行的内容."
 ---
 
 # 韦斯安德森项目领航
@@ -188,7 +188,7 @@ If a model wants to say "downstream files are affected", it must map the impact 
 ## Project Folder Contract
 
 For AI short-drama / AI short-video delivery projects, use the established project folder format from:
-`/Users/jude/Desktop/卡萨帝空调红楼梦AI短剧_项目交付文件夹`
+`/path/to/卡萨帝空调红楼梦AI短剧_项目交付文件夹`
 
 Do not invent a new directory layout per project. When scaffolding a project, create only the fixed standard directories below. Do not create broad "maybe useful" extra folders outside this contract.
 
@@ -327,11 +327,11 @@ Phase 7 · 内部逐镜 Prompt
 This skill delegates specialized work to companion skills:
 
 - Required for prompt production: `镜头设计师` / `shot-designer`. Asset prompt workbooks, internal per-shot prompt workbooks, final video prompt standards, and prompt validation live there.
-- Recommended for final user-facing archive PDFs: `土金PDF` / `tujinpdf`.
+- Required for formal final user-facing archive PDFs: `土金PDF` / `tujinpdf`.
 
 If `镜头设计师` is not installed and the user asks for asset prompts, first/end/keyframe prompts, or per-shot video prompts, stop and tell the user to install `shot-designer` from the same `judeyang-skills` repository before continuing. Do not fall back to the old embedded prompt rules.
 
-If `tujinpdf` is not installed and the user asks for the final styled PDF archive, ask whether to install/use `tujinpdf` or produce a simpler PDF with the available document tooling.
+If `tujinpdf` is not installed and the user asks for a formal final archive PDF, stop and tell the user to install/use `tujinpdf`. Use a simpler legacy PDF fallback only if the user explicitly accepts a non-土金PDF fallback.
 
 Required phase inputs:
 - Script audit: client script file or pasted script content.
@@ -531,12 +531,19 @@ When a client requests changes after a preview/sample clip has already been gene
 
 After final delivery is submitted, create a user-facing PDF archive from the latest internal revision workbook when there were multiple revision rounds or affected-duration records. This is the closeout step after video production is done, not another prompt/video-generation step.
 - Source: the latest internal revision workbook such as `项目修改记录与受影响时长_内部版_vNN.xlsx`, plus the project receipt/execution record.
-- Output: a PDF under `04_最终确认归档/` named with neutral wording such as `项目执行总结与调整影响说明_用户版_v01.pdf`.
+- Output: an HTML source and PDF under `04_最终确认归档/` named `项目名_项目执行总结与调整影响说明_vNN.html` and `项目名_项目执行总结与调整影响说明_vNN.pdf`.
+- Treat `最终总结报告`, `项目总结`, `项目复盘`, `closeout`, and `项目执行总结` as the same closeout artifact. Do not create a second PDF for any of these names.
+- The canonical external title and filename phrase is always `项目执行总结与调整影响说明`. Do not name user-facing closeout files `最终总结报告`, `最终总结报告_土金PDF`, `项目最终总结`, or similar variants.
+- If the user asks for `最终总结报告`, generate/update `项目名_项目执行总结与调整影响说明_vNN.html/pdf` instead, and briefly state that this is the fixed final-summary format.
 - Use the `tujinpdf` skill for the final user-facing `项目执行总结与调整影响说明` PDF unless the user specifies another style. Generate and keep both the styled HTML source and the PDF, so later revisions can update the existing HTML instead of recreating the layout from scratch.
-- Do not force the report into a fixed two-page length. Use as many A4 pages as the content needs. Prefer readability, correct table alignment, and comfortable spacing over compressing the document to fewer pages. Short summaries can be 1-2 pages; medium reports can be 3-5 pages; longer tables should paginate naturally.
+- Use the established closeout layout from `卡萨帝红楼梦AI短剧_项目执行总结与调整影响说明_v01.pdf` as the default. The report should look like a concise closeout memo, not a new general project report.
+- Default closeout structure is two A4 pages:
+  - Page 1: brand/project header, title `项目执行总结与调整影响说明`, one summary band with generated duration total / summary口径 / final submitted file and runtime, then `项目关键节点`, then the first part of `受影响内容明细`.
+  - Page 2: continue `受影响内容明细` if needed, then `调整影响汇总`, `最终交付文件`, and a short neutral confirmation note.
+- Only add a third page when the detail table is genuinely too long to remain readable. Do not expand a short/medium closeout into a 5-page magazine report.
 - Include: project timeline, final submitted file, confirmed adjustment rounds, affected shots/assets, user-visible reasons, `需重新制作时长`, and `已生成内容受影响时长合计`.
 - Include the final submitted video's actual runtime when the file is available, such as `最终成片文件：6月6日.mp4；最终成片时长：约74.2秒`. Keep this separate from affected-duration totals; do not imply that final runtime and affected duration use the same calculation basis.
-- Keep the closeout PDF simple and evidence-based. The user should immediately understand what the total affected duration consists of, why each item changed, what changed, and what result was delivered. Avoid overbuilding extra archive sections when a two-page summary is enough.
+- Keep the closeout PDF simple and evidence-based. The user should immediately understand what the total affected duration consists of, why each item changed, what changed, and what result was delivered. Avoid overbuilding extra archive sections, cover-image pages, dashboards, decorative cards, or generic "final summary report" layouts.
 - For user-facing affected-content detail tables, include the feedback time so the client can see which round each affected item came from. Recommended column order: `反馈时间`, `镜头/内容`, `时长`, `修改原因`, `修改内容`, `修改结果`.
 - Use the most precise feedback timestamp available from the project receipt/execution record or revision workbook. If the exact time exists, write `YYYY-MM-DD HH:MM`; if only the date exists, write `YYYY-MM-DD`. If a shot has a later supplementary instruction, keep the original feedback time and add a concise note such as `补充：20:13`.
 - Sort affected-content detail rows by feedback time first, then by the user's submitted order within the same feedback round. Do not sort primarily by shot number. This makes it clear when a later feedback round changed content that had already been generated or previously adjusted, and why the item belongs in the affected/rework summary.
@@ -631,9 +638,8 @@ client-relevant production basis.
 
 Before delivering a client-facing PDF:
 1. Read `references/client_facing_doc_standard.md`.
-2. Build the PDF with `scripts/build_client_confirmation_pdf.py` when the project matches the
-   standard confirmation archive structure.
-3. Run `scripts/validate_client_facing_text.py` against the generated PDF text manifest.
+2. Use `tujinpdf` to create a styled HTML source and render the same-name PDF. Do not use ReportLab or direct PDF drawing for normal final confirmation archives.
+3. Run `scripts/validate_client_facing_text.py` against the generated text manifest or extracted visible text.
 4. Do not deliver the PDF if the validator reports blocked wording or stale material status.
 
 ### 6. Internal Prompt And Shot Design
@@ -710,7 +716,7 @@ Use `scripts/create_project.py` to scaffold the stable structure and create the 
 Example:
 
 ```bash
-python /Users/jude/.codex/skills/wes-anderson/scripts/create_project.py \
+python scripts/create_project.py \
   --project-name "海尔空调西游记AI短剧" \
   --base-dir "$HOME/Desktop"
 ```
@@ -722,7 +728,7 @@ Use these scripts when possible instead of rebuilding the same Excel structure b
 ### Create Project
 
 ```bash
-python /Users/jude/.codex/skills/wes-anderson/scripts/create_project.py \
+python scripts/create_project.py \
   --project-name "项目名" \
   --base-dir "$HOME/Desktop"
 ```
@@ -732,7 +738,7 @@ Creates the fixed project folder structure, an initial `项目名_脚本与资�
 ### Audit Script Workbook
 
 ```bash
-python /Users/jude/.codex/skills/wes-anderson/scripts/audit_script.py \
+python scripts/audit_script.py \
   --input "/path/to/client_script.xlsx" \
   --project-dir "/path/to/项目交付文件夹"
 ```
@@ -745,7 +751,7 @@ Creates `脚本审核确认表_v01.xlsx` with:
 ### Build Internal Asset Production Table
 
 ```bash
-python /Users/jude/.codex/skills/shot-designer/scripts/build_asset_prompt_table.py \
+python ../shot-designer/scripts/build_asset_prompt_table.py \
   --input "/path/to/脚本审核确认表_v01.xlsx" \
   --project-dir "/path/to/项目交付文件夹"
 ```
@@ -757,31 +763,31 @@ Use this right after script audit when the user wants to make actual character, 
 ### Build Internal Prompt Table
 
 ```bash
-python /Users/jude/.codex/skills/shot-designer/scripts/build_prompt_table.py \
+python ../shot-designer/scripts/build_prompt_table.py \
   --input "/path/to/项目名_脚本与资产确认表_v01.xlsx" \
   --project-dir "/path/to/项目交付文件夹"
 ```
 
 Creates `内部执行脚本与Prompt表_v01.xlsx`: one worksheet, one row per shot, with source script fields and extracted reference assets. Prompt-related cells are intentionally blank for the AI director pass.
 
-### Build Client Confirmation PDF
+### Legacy Client Confirmation PDF Fallback
 
 ```bash
-python /Users/jude/.codex/skills/wes-anderson/scripts/build_client_confirmation_pdf.py \
+python scripts/build_client_confirmation_pdf.py \
   --project-dir "/path/to/项目交付文件夹" \
   --project-name "项目名" \
-  --output "/path/to/04_最终确认归档/项目名_脚本与设定资产最终确认归档_v01.pdf"
+  --output "/path/to/04_最终确认归档/项目名_脚本与设定资产最终确认归档_v01.pdf" \
+  --allow-legacy-reportlab
 ```
 
-Creates a client-facing PDF and a sibling `.manifest.txt` file. The generator validates the
-manifest before rendering. Run `scripts/validate_client_facing_text.py` again before delivery.
+Legacy fallback only. Use it only when `tujinpdf` is unavailable and the user explicitly accepts a simpler non-土金PDF archive. Normal final confirmation and closeout PDFs must use `tujinpdf` HTML + browser rendering.
 
 ### Delivery Checklist
 
 Before reporting a phase as complete, check:
 
 ```bash
-sed -n '1,220p' /Users/jude/.codex/skills/wes-anderson/references/delivery_checklist.md
+sed -n '1,220p' references/delivery_checklist.md
 ```
 
 Apply the matching P0/P1 items. Do not claim completion when the current phase output is missing, has the wrong version, is in the wrong folder, or exposes internal production language to the client.
@@ -813,7 +819,8 @@ Examples:
 - `角色_孙悟空_全身照_无文字_v01.png`
 - `场景_黄风岭_设定图_v01.png`
 - `产品_海尔洗空气空调_官方参考_v01.png`
-- `归档_客户最终确认_v01.pdf`
+- `项目名_脚本与设定资产最终确认归档_v01.pdf`
+- `项目名_项目执行总结与调整影响说明_v01.pdf`
 - `内部执行脚本与Prompt表_v01.xlsx`
 - `封面_项目名_主题_v01.png`
 

@@ -77,7 +77,7 @@ cp -R judeyang-skills/shot-designer ~/.codex/skills/
 cp -R judeyang-skills/tujinpdf ~/.codex/skills/
 ```
 
-最低安装：
+基础安装（不进入正式用户版 PDF 归档阶段）：
 
 ```bash
 cp -R judeyang-skills/wes-anderson ~/.codex/skills/
@@ -86,7 +86,7 @@ cp -R judeyang-skills/shot-designer ~/.codex/skills/
 
 依赖说明：
 - `shot-designer`：必需。负责 Prompt 标准、Prompt 表生成和 Prompt 校验。
-- `tujinpdf`：推荐。用于最终用户版确认/归档 PDF；没有它也可以改用普通 PDF 工具。
+- `tujinpdf`：必需用于正式用户版确认/归档 PDF。没有它时必须暂停并提示安装；只有用户明确接受 legacy fallback 时，才可使用普通 PDF 工具。
 
 如果运行环境只安装了 `wes-anderson`，通常不会自动弹出系统级依赖安装提示；需要 README 或本 skill 在执行到 Prompt 阶段时明确提醒补装。
 
@@ -147,7 +147,7 @@ wes-anderson/
 │   └── client_facing_doc_standard.md
 └── scripts/
     ├── audit_script.py
-    ├── build_client_confirmation_pdf.py
+    ├── build_client_confirmation_pdf.py  # legacy fallback only
     ├── create_project.py
     └── validate_client_facing_text.py
 ```

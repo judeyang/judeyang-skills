@@ -78,7 +78,7 @@ cp -R judeyang-skills/shot-designer ~/.codex/skills/
 cp -R judeyang-skills/tujinpdf ~/.codex/skills/
 ```
 
-Minimum installation:
+Base installation, without formal user-facing PDF archive support:
 
 ```bash
 cp -R judeyang-skills/wes-anderson ~/.codex/skills/
@@ -87,7 +87,7 @@ cp -R judeyang-skills/shot-designer ~/.codex/skills/
 
 Dependency notes:
 - `shot-designer`: required. Owns prompt standards, prompt workbook generation, and prompt validation.
-- `tujinpdf`: recommended. Used for final user-facing confirmation/archive PDFs; without it, use a simpler available PDF workflow.
+- `tujinpdf`: required for formal final user-facing confirmation/archive PDFs. If it is missing, pause and ask to install it; use a simpler PDF workflow only when the user explicitly accepts a legacy fallback.
 
 If a runtime installs only `wes-anderson`, it will usually not show an automatic system-level dependency prompt. The skill must tell the user to install the companion skill when the workflow reaches prompt production.
 
@@ -144,7 +144,7 @@ wes-anderson/
 │   └── client_facing_doc_standard.md
 └── scripts/
     ├── audit_script.py
-    ├── build_client_confirmation_pdf.py
+    ├── build_client_confirmation_pdf.py  # legacy fallback only
     ├── create_project.py
     └── validate_client_facing_text.py
 ```

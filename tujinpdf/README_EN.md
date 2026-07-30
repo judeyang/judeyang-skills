@@ -1,4 +1,4 @@
-# TuJin PDF
+# TuJin Magazine-style PDF
 
 English | [中文](README.md)
 
@@ -126,10 +126,10 @@ document_topic_TuJinPDF_v01_preview.png
 The skill includes a browser-based rendering script:
 
 ```bash
-node scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
+node scripts/render-html-pdf.js input.html output.pdf --screenshot preview.png
 ```
 
-The script prefers an available Puppeteer runtime. If Puppeteer's bundled Chrome is missing, it attempts to use the local Google Chrome installation.
+The script prefers an available Puppeteer runtime. If Puppeteer or its bundled Chrome is unavailable, it falls back to a supported local Chrome executable in headless mode.
 
 ---
 
@@ -181,12 +181,16 @@ tujinpdf/
 ├── SKILL.md
 ├── README.md
 ├── README_EN.md
+├── package.json
 ├── agents/
 │   └── openai.yaml
 ├── references/
 │   └── fatepaw-style-notes.md
-└── scripts/
-    └── render-html-pdf.mjs
+├── scripts/
+│   ├── render-html-pdf.js
+│   └── validate-output.mjs
+└── templates/
+    └── base-a4.html
 ```
 
 ---

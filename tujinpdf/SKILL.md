@@ -1,9 +1,9 @@
 ---
-name: 土金PDF
-description: Convert any existing file or document into a polished A4 土金色系 magazine-style PDF. Use when the user asks for “土金PDF”, “tujinpdf”, “土金色系PDF”, “杂志风PDF”, or wants a document restyled with a specific earthy-gold palette, refined typography, spacing, page rhythm, tables, cover, and print-ready PDF layout. This skill only changes visual style and layout; preserve content unless the user explicitly asks for content edits.
+name: tujinpdf
+description: 将现有文档排版成土金色系 A4 杂志风 PDF，优化封面、字体、留白、分页和表格，并默认保留原文内容。适用于“土金PDF”“土金色系PDF”“杂志风PDF”和正式文档美化等需求。
 ---
 
-# 土金PDF
+# 土金杂志风PDF
 
 > Created by JudeYang.
 
@@ -71,7 +71,7 @@ HTML 必须保留，因为后续改版要直接在原 HTML 上升级，不要每
 1. **读取输入**：确认源文件路径、文本内容、目标读者、是否需要保留全部内容。
 2. **提取结构**：识别标题、日期、元信息、章节、表格、列表、关键数字和附件说明。
 3. **生成 HTML**：使用 A4 页面、土金色系变量、封面、页眉页脚、章节和表格样式。
-4. **渲染 PDF**：运行 `scripts/render-html-pdf.mjs` 输出 PDF 和预览截图。
+4. **渲染 PDF**：运行 `scripts/render-html-pdf.js` 输出 PDF 和预览截图。
 5. **质量检查**：检查 PDF 可打开、页数合理、文本可提取、截图无明显溢出重叠。
 6. **交付说明**：说明生成了哪些文件、是否改动原文、未验证项和下一步可改什么。
 
@@ -127,10 +127,7 @@ HTML 必须保留，因为后续改版要直接在原 HTML 上升级，不要每
 - `.prod`
 - 细线表格
 
-可参考 FatePaw 模板的视觉语言，但不要继承其命理业务内容：
-
-- `/Users/jude/同步空间/作品集/APP/bazi/fatepaw/src/templates/pet-reading-pdf-zh.html`
-- `/Users/jude/同步空间/作品集/APP/bazi/fatepaw/src/templates/human-reading-pdf-zh.html`
+视觉参考只使用本 Skill 已定义的土金配色、留白、细线和杂志式层级，不依赖外部私有模板。
 
 ## Content Rules
 
@@ -171,10 +168,10 @@ HTML 必须保留，因为后续改版要直接在原 HTML 上升级，不要每
 使用真实浏览器渲染，不用 ReportLab 手搓 PDF。
 
 ```bash
-node /Users/jude/.codex/skills/tujinpdf/scripts/render-html-pdf.mjs input.html output.pdf --screenshot preview.png
+node scripts/render-html-pdf.js input.html output.pdf --screenshot preview.png
 ```
 
-脚本会优先使用可用的 Puppeteer；如果 Puppeteer 自带 Chrome 缺失，会尝试本机 Chrome：
+脚本会优先使用可用的 Puppeteer；没有 Puppeteer 或其自带 Chrome 不可用时，会回退到本机 Chrome 的 headless 模式：
 
 `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
 

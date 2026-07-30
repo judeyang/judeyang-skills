@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build a client-facing final confirmation PDF for an AI short-video project."""
+"""Legacy ReportLab fallback for a client-facing final confirmation PDF.
+
+Normal final confirmation and closeout PDFs must be generated through the
+tujinpdf HTML + browser-rendering workflow. This script is retained only for
+explicit legacy fallback use.
+"""
 
 from __future__ import annotations
 
@@ -8,26 +13,6 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-
-from openpyxl import load_workbook
-from PIL import Image as PILImage
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.cidfonts import UnicodeCIDFont
-from reportlab.platypus import (
-    Image,
-    PageBreak,
-    Paragraph,
-    SimpleDocTemplate,
-    Spacer,
-    Table,
-    TableStyle,
-)
-
 
 def latest_file(folder: Path, pattern: str) -> Path:
     files = sorted(folder.glob(pattern))
@@ -136,7 +121,44 @@ def main() -> int:
     parser.add_argument("--confirm-date", default="")
     parser.add_argument("--project-stage", default="进入样片及后续视频制作阶段")
     parser.add_argument("--sample-status", default="")
+    parser.add_argument(
+        "--allow-legacy-reportlab",
+        action="store_true",
+        help="Required. Use only when tujinpdf is unavailable and the user explicitly accepts the legacy ReportLab fallback.",
+    )
     args = parser.parse_args()
+
+    if not args.allow_legacy_reportlab:
+        print(
+            "Refusing to generate a formal client-facing PDF with the legacy ReportLab fallback. "
+            "Use the tujinpdf HTML + browser-rendering workflow, or rerun with "
+            "--allow-legacy-reportlab only after explicit user approval.",
+            file=sys.stderr,
+        )
+        return 2
+
+    global load_workbook, PILImage, colors, TA_CENTER, TA_LEFT, A4
+    global ParagraphStyle, getSampleStyleSheet, mm, pdfmetrics, UnicodeCIDFont
+    global Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+    from openpyxl import load_workbook
+    from PIL import Image as PILImage
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+    from reportlab.platypus import (
+        Image,
+        PageBreak,
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+        Table,
+        TableStyle,
+    )
 
     project_dir = Path(args.project_dir).expanduser()
     output = Path(args.output).expanduser()

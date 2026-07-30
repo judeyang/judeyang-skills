@@ -235,7 +235,8 @@ def write_rules(path: Path, project_name: str):
 - `场景_黄风岭_设定图_v01.png`
 - `道具_净风宝瓶_设定图_v01.png`
 - `关键帧_产品显化_v01.png`
-- `归档_客户最终确认_v01.pdf`
+- `项目名_脚本与设定资产最终确认归档_v01.pdf`
+- `项目名_项目执行总结与调整影响说明_v01.pdf`
 - `内部执行脚本与Prompt表_v01.xlsx`
 
 ## 规则
