@@ -1,6 +1,0 @@
-interface:
-  display_name: "Jude Project Operator"
-  short_description: "项目进入、开发修改、验证、Git和文档闭环"
-  default_prompt: "Use $jude-project-operator to enter this project, understand its rules, make the requested change, verify it, and report the final status."
-policy:
-  allow_implicit_invocation: true

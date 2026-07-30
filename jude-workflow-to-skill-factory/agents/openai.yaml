@@ -1,6 +1,0 @@
-interface:
-  display_name: "Jude Skill Factory"
-  short_description: "把重复提示、评分表和流程沉淀成可验证Skill"
-  default_prompt: "Use $jude-workflow-to-skill-factory to turn this repeated workflow into a concise reusable Skill with validation."
-policy:
-  allow_implicit_invocation: true
